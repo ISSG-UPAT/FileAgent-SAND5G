@@ -8,4 +8,4 @@ src/fileagent.egg-info/SOURCES.txt
 src/fileagent.egg-info/dependency_links.txt
 src/fileagent.egg-info/requires.txt
 src/fileagent.egg-info/top_level.txt
-tests/test_agent.py
+tests/test_fileagent.py

@@ -21,6 +21,8 @@ Requires-Dist: twine>=3.4.2; extra == "dev"
 Requires-Dist: pipdeptree>=2.0.0; extra == "dev"
 Provides-Extra: docs
 Requires-Dist: pdoc3>=0.11.4; extra == "docs"
+Provides-Extra: test
+Requires-Dist: unittest2>=1.1.0; extra == "test"
 Dynamic: license-file
 
 # FileAgent Project
