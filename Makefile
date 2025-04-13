@@ -38,9 +38,13 @@ install-req-docs:
 	@echo "Documentation dependencies installed."
 
 
+install-req-all:
+	@source $(VENV_DIR)/bin/activate && pip install -e .[dev,docs]
+	@echo "All dependencies installed."
+
 # All in one create venv and setup 
 
-setup-all-dev: create-venv venv-upgrade-pip setup-toml install-req-dev install-req-docs
+setup-all-dev: create-venv venv-upgrade-pip setup-toml install-pack-dev install-req-all
 	@echo "All development setup steps completed."
 
 
@@ -48,6 +52,13 @@ setup-all-dev: create-venv venv-upgrade-pip setup-toml install-req-dev install-r
 # NOT YET IMPLEMENTED 
 upload-pypi:
 	@source $(VENV_DIR)/bin/activate  && twine upload dist/*
+
+
+# Testing 
+
+test:
+	@source $(VENV_DIR)/bin/activate && pytest -v --tb=short --disable-warnings --maxfail=1
+	@echo "Tests completed."
 
 
 # Documentation 
