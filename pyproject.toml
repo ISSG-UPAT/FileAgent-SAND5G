@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=6.2.4", "twine>=3.4.2", "pipdeptree>=2.0.0"]
+dev = ["pytest>=6.2.4", "twine>=3.4.2", "pipdeptree>=2.0.0", "httpx>0.24.0"]
 docs = ["pdoc3>=0.11.4"]
 
 [project.urls]
