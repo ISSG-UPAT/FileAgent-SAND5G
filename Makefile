@@ -3,6 +3,8 @@ PYTHON=python3
 SHELL := /bin/bash
 
 
+all: setup-all-dev
+
 setup-toml: 
 	@source $(VENV_DIR)/bin/activate && pip install --editable . 
 
@@ -52,7 +54,13 @@ upload-pypi:
 
 PDOC_DIR=docs/pdoc/
 
-doc-pdoc:
+$(PDOC_DIR):
+	@mkdir -p $(PDOC_DIR)
+	@echo "Created documentation directory $(PDOC_DIR)"
+
+
+doc-pdoc: $(PDOC_DIR)
+	@echo "Generating documentation using pdoc..."
 	@source $(VENV_DIR)/bin/activate && make -C $(PDOC_DIR) create
 	@echo "Documentation created using pdoc."
 
@@ -83,3 +91,6 @@ help:
 	@echo "      Use 'deactivate' to exit the virtual environment."
 	@echo ""
 	@echo "Makefile for managing Python package setup and documentation."
+
+
+.PHONY: create-venv clean-venv venv-upgrade-pip setup-toml install-pack-dev install-req-dev install-req-docs setup-all-dev upload-pypi doc-pdoc doc-pdoc-host help

@@ -1,0 +1,229 @@
+Metadata-Version: 2.4
+Name: fileagent
+Version: 0.1.0
+Summary: Python fileagent to accompany Snort in a container
+Author: Nikolas Filippatos
+License: MIT
+Project-URL: Homepage, https://github.com/ISSG-Projects/FileAgentSAND5G
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: build>=0.7.0
+Requires-Dist: setuptools>=67.7.0
+Requires-Dist: wheel>0.37.0
+Requires-Dist: fastapi>=0.110.0
+Requires-Dist: uvicorn>=0.34.0
+Requires-Dist: requests>=2.30.0
+Requires-Dist: python-multipart>=0.0.20
+Provides-Extra: dev
+Requires-Dist: pytest>=6.2.4; extra == "dev"
+Requires-Dist: twine>=3.4.2; extra == "dev"
+Requires-Dist: pipdeptree>=2.0.0; extra == "dev"
+Provides-Extra: docs
+Requires-Dist: pdoc3>=0.11.4; extra == "docs"
+Dynamic: license-file
+
+# FileAgent Project
+
+## Overview
+
+The **FileAgent** project is a Flask-based API designed to handle file uploads and process the content of the uploaded files. The primary purpose of this project is to extract IP addresses, URLs, or other relevant data from the uploaded files and append them as rules to a `local.rules` file. However, the rule appending functionality currently uses a placeholder implementation and does not generate rules in the correct syntax.
+
+---
+
+## Project Structure
+
+The project is organized as follows:
+
+```
+fileagent/
+├── src/
+├── agent.py # Main Flask application and logic
+│
+├── tests/
+├── test_agent.py # Script to test the API endpoints
+│
+├── ../snort/volumes/custom/
+├── mock.local.rules # Temporal File where rules are appended
+│
+├── app_venv/ # Virtual environment (optional, not included in version control)
+└── README.md # Project documentation
+```
+
+### Key Components:
+
+1. **`src/agent.py`**:
+
+   - Contains the `FileAgent` class, which defines the Flask API and its routes.
+   - Implements methods for processing uploaded files, extracting data, and appending rules to the `local.rules` file.
+
+2. **`tests/test_agent.py`**:
+
+   - A script to test the `/upload` endpoint by sending sample JSON and text files.
+   - Uses Python's `requests` library to simulate file uploads.
+
+3. **`custom/mock.local.rules`**:
+   - This is a temporary file, that appends the mock rules. When the translator is fixed, it should change to the real `local.rules` file.
+   - The file where rules are appended based on the content of uploaded files.
+   - Currently, the rules are appended as simple placeholder sentences (e.g., `block <IP>`).
+
+---
+
+## API Documentation
+
+### Base URL:
+
+The API runs locally by default at `http://127.0.0.1:<PORT>`, where `<PORT>` is configurable via the `PORT` environment variable (default: `8000`).
+
+### Endpoints:
+
+#### 1. **File Upload**
+
+- **URL**: `/upload`
+- **Method**: `POST`
+- **Description**: Accepts file uploads and processes the content to generate rules.
+- **Request**:
+  - **Headers**:
+    - `Content-Type: multipart/form-data`
+  - **Body**:
+    - A file must be uploaded with the key [file].
+    - Supported file types:
+      - `application/json`
+      - `text/plain`
+- **Example Request**:
+  ```bash
+  curl -X POST -F "file=@tests/sample.json" http://127.0.0.1:5000/upload
+  ```
+- **Responses**:
+  - **Success (JSON file)**:
+    ```json
+    {
+      "message": "JSON file received",
+      "content": "{ \"key\": \"value\" }"
+    }
+    ```
+  - **Success (Text file)**:
+    ```json
+    {
+      "message": "Text file received",
+      "content": "This is a sample text file."
+    }
+    ```
+  - **Error (No file in request)**:
+    ```json
+    {
+      "error": "No file part in the request"
+    }
+    ```
+  - **Error (No file selected)**:
+    ```json
+    {
+      "error": "No file selected"
+    }
+    ```
+  - **Error (Unsupported file type)**:
+    ```json
+    {
+      "error": "Unsupported file type"
+    }
+    ```
+
+#### 2. **Fastapi Docs (Swagger UI)**
+
+- **URL**: `/docs`
+- **Method**: `GET`
+- **Description**: Provides an interactive API documentation interface.
+
+---
+
+## Rule Appending Functionality
+
+### Where Rules Are Saved:
+
+- Rules are appended to the [local.rules] file inside `../snort/volumes/custom` . This is defined inside the docker compose
+- The file is located in the [data] directory relative to the project root.
+
+### Current Implementation:
+
+- The [append_rule] method in [agent.py] is responsible for appending rules.
+- Rules are generated using the [rule_translator] method, which processes the content of uploaded files.
+- **Note**: The current implementation uses placeholder rules in the format: `block <IP>`.
+
+This is not the correct syntax for Snort or any other rule-based system.
+
+### Limitations:
+
+- The [rule_translator] method does not generate rules in the correct syntax.
+- The logic for translating file content into valid rules is not yet implemented.
+
+---
+
+## How to Run the Project
+
+### Prerequisites:
+
+- Python 3.8 or higher
+- Flask library
+- `requests` library (for testing)
+
+### Steps:
+
+1. Clone the repository:
+
+```bash
+ git clone <repository-url>
+ cd fileagent
+```
+
+2. Set up a virtual environment (optional but recommended):
+
+```bash
+python3 -m venv app_venv
+source app_venv/bin/activate
+pip install -r requirements.txt
+```
+
+3. Create the local.rules file if it does not exist:
+
+```bash
+mkdir -p data
+touch data/local.rules
+```
+
+4. Run the Flask application:
+
+```bash
+export PORT=5000  # Optional: Set a custom port
+python src/agent.py
+```
+
+Test the API using curl or the provided test_agent.py script.
+
+Testing the API
+Using curl:
+Upload a JSON file:
+
+```bash
+curl -X POST -F "file=@tests/sample.json" http://127.0.0.1:5000/upload
+```
+
+```bash
+curl -X POST -F "file=@tests/sample.txt" http://127.0.0.1:5000/upload
+```
+
+## Future Improvements
+
+Implement Correct Rule Syntax:
+
+Update the rule_translator method to generate rules in the correct syntax for Snort or other rule-based systems.
+Enhanced Validation:
+
+Add validation for the content of uploaded files to ensure they meet specific criteria.
+Error Handling:
+
+Improve error handling for edge cases (e.g., malformed JSON, unsupported file types).
+Logging:
+
+Add logging to track API requests and rule generation.
+
+Perhaps check to use Fastapi ?
