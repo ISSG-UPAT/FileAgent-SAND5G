@@ -1,204 +1,128 @@
-# FileAgent Project
+# FileAgent
+
+```toc
+
+```
+
+## About
+
+This repository is part of the SAND5G project, which aims to enhance security in 5G networks. FileAgent is a tool designed to facilitate the management of Snort rules in a containerized environment.
+
+5G -and beyond- networks provide a strong foundation for EU’s digital transformation and are becoming one of the Union’s key assets to compete in the global market.
+
+Securing 5G networks and the services running on top of them requires high quality technical security solutions and also strong collaboration at the operational level.
+
+https://sand5g-project.eu
+
+![SAND5G](https://sand5g-project.eu/wp-content/uploads/2024/06/SAND5G-logo-600x137.png)
 
 ## Overview
 
-The **FileAgent** project is a Flask-based API designed to handle file uploads and process the content of the uploaded files. The primary purpose of this project is to extract IP addresses, URLs, or other relevant data from the uploaded files and append them as rules to a `local.rules` file. However, the rule appending functionality currently uses a placeholder implementation and does not generate rules in the correct syntax.
+FileAgent is a Python-based application designed to accompany Snort in a containerized environment. It provides a FastAPI-based interface for uploading and managing custom rules for Snort. The application supports JSON and plain text file uploads, translates the content into Snort-compatible rules, and appends them to a rules file while ensuring backups and avoiding duplicates.
 
----
+## Features
 
-## Project Structure
+- Upload JSON or plain text files containing IP addresses or URLs.
+- Automatically translate uploaded content into Snort-compatible rules.
+- Append rules to a custom rules file (`mock.local.rules` by default).
+- Backup the rules file before appending new rules.
+- Avoid duplicate rule entries.
 
-The project is organized as follows:
+## Requirements
 
-```
-fileagent/
-├── src/
-├── agent.py # Main Flask application and logic
-│
-├── tests/
-├── test_agent.py # Script to test the API endpoints
-│
-├── ../snort/volumes/custom/
-├── mock.local.rules # Temporal File where rules are appended
-│
-├── app_venv/ # Virtual environment (optional, not included in version control)
-└── README.md # Project documentation
-```
+- Python 3.11 or higher
+- Dependencies listed in `pyproject.toml`:
+  - `fastapi`
+  - `uvicorn`
+  - `requests`
+  - `python-multipart`
 
-### Key Components:
-
-1. **`src/agent.py`**:
-
-   - Contains the `FileAgent` class, which defines the Flask API and its routes.
-   - Implements methods for processing uploaded files, extracting data, and appending rules to the `local.rules` file.
-
-2. **`tests/test_agent.py`**:
-
-   - A script to test the `/upload` endpoint by sending sample JSON and text files.
-   - Uses Python's `requests` library to simulate file uploads.
-
-3. **`custom/mock.local.rules`**:
-   - This is a temporary file, that appends the mock rules. When the translator is fixed, it should change to the real `local.rules` file.
-   - The file where rules are appended based on the content of uploaded files.
-   - Currently, the rules are appended as simple placeholder sentences (e.g., `block <IP>`).
-
----
-
-## API Documentation
-
-### Base URL:
-
-The API runs locally by default at `http://127.0.0.1:<PORT>`, where `<PORT>` is configurable via the `PORT` environment variable (default: `8000`).
-
-### Endpoints:
-
-#### 1. **File Upload**
-
-- **URL**: `/upload`
-- **Method**: `POST`
-- **Description**: Accepts file uploads and processes the content to generate rules.
-- **Request**:
-  - **Headers**:
-    - `Content-Type: multipart/form-data`
-  - **Body**:
-    - A file must be uploaded with the key [file].
-    - Supported file types:
-      - `application/json`
-      - `text/plain`
-- **Example Request**:
-  ```bash
-  curl -X POST -F "file=@tests/sample.json" http://127.0.0.1:5000/upload
-  ```
-- **Responses**:
-  - **Success (JSON file)**:
-    ```json
-    {
-      "message": "JSON file received",
-      "content": "{ \"key\": \"value\" }"
-    }
-    ```
-  - **Success (Text file)**:
-    ```json
-    {
-      "message": "Text file received",
-      "content": "This is a sample text file."
-    }
-    ```
-  - **Error (No file in request)**:
-    ```json
-    {
-      "error": "No file part in the request"
-    }
-    ```
-  - **Error (No file selected)**:
-    ```json
-    {
-      "error": "No file selected"
-    }
-    ```
-  - **Error (Unsupported file type)**:
-    ```json
-    {
-      "error": "Unsupported file type"
-    }
-    ```
-
-#### 2. **Fastapi Docs (Swagger UI)**
-
-- **URL**: `/docs`
-- **Method**: `GET`
-- **Description**: Provides an interactive API documentation interface.
-
----
-
-## Rule Appending Functionality
-
-### Where Rules Are Saved:
-
-- Rules are appended to the [local.rules] file inside `../snort/volumes/custom` . This is defined inside the docker compose
-- The file is located in the [data] directory relative to the project root.
-
-### Current Implementation:
-
-- The [append_rule] method in [agent.py] is responsible for appending rules.
-- Rules are generated using the [rule_translator] method, which processes the content of uploaded files.
-- **Note**: The current implementation uses placeholder rules in the format: `block <IP>`.
-
-This is not the correct syntax for Snort or any other rule-based system.
-
-### Limitations:
-
-- The [rule_translator] method does not generate rules in the correct syntax.
-- The logic for translating file content into valid rules is not yet implemented.
-
----
-
-## How to Run the Project
-
-### Prerequisites:
-
-- Python 3.8 or higher
-- Flask library
-- `requests` library (for testing)
-
-### Steps:
+## Installation
 
 1. Clone the repository:
 
+   ```bash
+   git clone https://github.com/ISSG-Projects/FileAgentSAND5G.git
+   cd FileAgentSAND5G
+   ```
+
+2. Create a virtual environment
+
+   ```bash
+   python -m venv venv
+   ```
+
+   or
+
+   ```bash
+   make create-venv
+   ```
+
+3. Activate the virtual environment:
+
+   - On Windows:
+
+     ```bash
+     venv\Scripts\activate
+     ```
+
+   - On macOS/Linux:
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install the required dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+   or
+
+   ```bash
+   make install
+   ```
+
+5. Run the FastAPI application:
+
+   ```bash
+
+   ```
+
+## API Endpoints
+
+- POST /upload: Upload a JSON or plain text file containing IP addresses or URLs. The content is translated into Snort rules and appended to the rules file.
+
+## Documentation
+
+The project documentation is generated using pdoc3. To generate and view the documentation:
+
 ```bash
- git clone <repository-url>
- cd fileagent
+make docs-pdoc
 ```
 
-2. Set up a virtual environment (optional but recommended):
+Open the generated HTML files in the `docs` directory.
+
+Open the generated HTML files in the browser
 
 ```bash
-python3 -m venv app_venv
-source app_venv/bin/activate
-pip install -r requirements.txt
+make docs-pdoc-host
 ```
 
-3. Create the local.rules file if it does not exist:
+Additionally the FastAPI framework provides an interactive API documentation at `http://localhost:8000/docs` when the application is running. This allows you to test the API endpoints directly from your browser.
 
-```bash
-mkdir -p data
-touch data/local.rules
-```
+## Future Implementations
 
-4. Run the Flask application:
+<input disabled="" type="checkbox"> Add support for additional file formats (e.g., XML, CSV).
+<input disabled="" type="checkbox"> Implement rule validation against a predefined schema.
+<input disabled="" type="checkbox"> Add logging for better traceability.
+<input disabled="" type="checkbox"> Create a web-based dashboard for managing rules.
+<input disabled="" type="checkbox"> Integrate with external threat intelligence feeds.
 
-```bash
-export PORT=5000  # Optional: Set a custom port
-python src/agent.py
-```
+## License
 
-Test the API using curl or the provided test_agent.py script.
+This project is licensed under the MIT License. See the LICENSE file for details.
 
-Testing the API
-Using curl:
-Upload a JSON file:
+## Contributing
 
-```bash
-curl -X POST -F "file=@tests/sample.json" http://127.0.0.1:5000/upload
-```
-
-```bash
-curl -X POST -F "file=@tests/sample.txt" http://127.0.0.1:5000/upload
-```
-
-## Future Improvements
-
-Implement Correct Rule Syntax:
-
-Update the rule_translator method to generate rules in the correct syntax for Snort or other rule-based systems.
-Enhanced Validation:
-
-Add validation for the content of uploaded files to ensure they meet specific criteria.
-Error Handling:
-
-Improve error handling for edge cases (e.g., malformed JSON, unsupported file types).
-Logging:
-
-Add logging to track API requests and rule generation.
-
-Perhaps check to use Fastapi ?
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes

@@ -1,8 +1,7 @@
-## Pdoc 
+## Pdoc
 
-Autodocumentation with pdoc 
-
+Autodocumentation with pdoc
 
 ```bash
-pdoc3 <package name> --html -o ./docs/pdoc/<package name> 
+pdoc3 <package name> --html -o ./docs/pdoc/<package name>
 ```

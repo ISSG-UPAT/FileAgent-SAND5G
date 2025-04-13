@@ -7,4 +7,4 @@ create:
 	pdoc3 $(PACKAGE) --html -o $(DEST)
 
 host: 
-	cd $(DEST) && $(PYTHON) -m http.server 8000
+	cd $(DEST) && $(PYTHON) -m http.server 8500
