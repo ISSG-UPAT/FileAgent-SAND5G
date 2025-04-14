@@ -20,9 +20,12 @@ class FileAgent:
         self.default_values(port, host, directory, file)
 
         self.app = FastAPI()
+        # This should change to correlate with the arguments passed
+
         self.internal_path = Path(__file__).parent.parent
         # For non docker usage
         self.internal_path = Path(self.internal_path.parent, "snort", "volumes")
+
         self.data_path = Path(self.internal_path, "custom")
         self.data_backup_path = Path(self.data_path, "backup")
         self.rules_file = Path(self.data_path, self.args.file)
@@ -82,7 +85,25 @@ class FileAgent:
                 provided_value if provided_value is not None else default_value,
             )
 
-    def default_values(self, port, host, directory, file):
+    def default_values(self, port: int, host: str, directory: str, file: str):
+        """
+        Description:
+            This function is meant to be run by the init function of the class
+            Set the default values for the agent
+            This function sets the default values for the agent. It checks if the arguments passed to the Class are None, and calls the arguments from argparse.
+            If the arguments are not None, it assigns the values to the attribute of the class.
+            If the directory is None, it sets the directory to the parent of the file.
+            It also checks if the file is None, and raises a ValueError if it is.
+
+        Args:
+            port (int): Port to run the fastapi server on
+            host (str): Host of the fastapi server
+            directory (str): Path to the data directory
+            file (str): Path to the file
+
+        Raises:
+            ValueError: File name is required
+        """
 
         if any([arg is None for arg in [port, host, directory, file]]):
             self.set_arguments()
@@ -96,26 +117,6 @@ class FileAgent:
         }
 
         self.assign_attributes(attributes)
-
-        # if port is None:
-        #     self.port = self.args.port
-        # else:
-        #     self.port = port
-
-        # if host is None:
-        #     self.host = self.args.host
-        # else:
-        #     self.host = host
-
-        # if directory is None:
-        #     self.directory = self.args.directory
-        # else:
-        #     self.directory = directory
-
-        # if file is None:
-        #     self.file = self.args.file
-        # else:
-        #     self.file = file
 
         if self.file is None:
             raise ValueError("File name is required")
@@ -182,6 +183,26 @@ class FileAgent:
                 return match.group(0)
         return None
 
+    def get_ip_from_request(self, request: dict) -> str:
+        """
+        Description:
+            Get the ip address from the request
+
+        Args:
+            request (dict): Request data to be checked for ip address
+
+        Returns:
+            str: The ip address from the request
+        """
+
+        if request.get("content_type") == "application/json":
+            data = json.loads(request.get("content"))
+            return data.get("ip")
+        elif request.get("content_type") == "text/plain":
+            return self.ip_matches(request.get("content"))
+        else:
+            return None
+
     def rule_translator(self, data: dict) -> str:
         """
         Description:
@@ -196,15 +217,10 @@ class FileAgent:
             str: Rule to be appended to the rules file
         """
 
-        if data.get("content_type") == "application/json":
-            data = json.loads(data.get("content"))
-            rule = f"block {data.get('ip')}"
-        elif data.get("content_type") == "text/plain":
-            ip = self.ip_matches(data.get("content"))
-            if ip is None:
-                return None
-            # rule = f"block {ip}"
-            rule = f"""alert ip {ip} any -> $HOME_NET any (msg: "IP Alert Incoming From IP: {ip}";   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)"""
+        if ip := self.get_ip_from_request(data) is None:
+            return None
+
+        rule = f"""alert ip {ip} any -> $HOME_NET any (msg: "IP Alert Incoming From IP: {ip}";   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)"""
 
         return rule
 
