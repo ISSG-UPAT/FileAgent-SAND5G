@@ -5,7 +5,6 @@ import re
 import uvicorn
 import argparse
 import datetime
-import sys
 
 
 class FileAgent:
@@ -218,7 +217,7 @@ class FileAgent:
         """
 
         if ip := self.get_ip_from_request(data) is None:
-            return None
+            return
 
         rule = f"""alert ip {ip} any -> $HOME_NET any (msg: "IP Alert Incoming From IP: {ip}";   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)"""
 
@@ -235,8 +234,7 @@ class FileAgent:
 
         # Right now this is just a simple implementation
 
-        rule = self.rule_translator(data)
-        if rule is None:
+        if rule := self.rule_translator(data) is None:
             return
 
         if self.rule_exists(rule):

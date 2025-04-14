@@ -1,4 +1,5 @@
 from fileagent import FileAgent
+import json
 
 
 class Example(FileAgent):
@@ -19,15 +20,10 @@ class Example(FileAgent):
             str: Rule to be appended to the rules file
         """
 
-        if data.get("content_type") == "application/json":
-            data = json.loads(data.get("content"))
-            rule = f"block {data.get('ip')}"
-        elif data.get("content_type") == "text/plain":
-            ip = self.ip_matches(data.get("content"))
-            if ip is None:
-                return None
-            # rule = f"block {ip}"
-            rule = f"""alert ip {ip} any -> $HOME_NET any (msg: "IP Alert Incoming From IP: {ip}";   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)"""
+        if ip := self.get_ip_from_request(data) is None:
+            return
+
+        rule = f"""alert ip {ip} any -> $HOME_NET any (msg: "IP Alert Incoming From IP: {ip}";   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)"""
 
         return rule
 
