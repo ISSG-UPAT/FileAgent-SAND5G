@@ -9,9 +9,16 @@ import sys
 
 
 class FileAgent:
-    def __init__(self, port: int = None, host: str = None, file: str = None):
+    def __init__(
+        self,
+        port: int = None,
+        host: str = None,
+        directory: str = None,
+        file: str = None,
+    ):
 
-        self.set_arguments()
+        self.default_values(port, host, directory, file)
+
         self.app = FastAPI()
         self.internal_path = Path(__file__).parent.parent
         # For non docker usage
@@ -48,22 +55,49 @@ class FileAgent:
             "-f",
             "--file",
             type=str,
-            default="mock.local.rules",
+            default=None,
             help="Path to the file",
         )
 
         self.parser.add_argument(
             "-d",
-            "--dir",
+            "--directory",
             type=str,
             default=None,
             help="Path to the data directory",
         )
 
-        self.args = self.parser.parse_args()
-        self.port = self.args.port
-        self.host = self.args.host
-        self.file = self.args.file
+    def default_values(self, port, host, directory, file):
+
+        if any([arg is None for arg in [port, host, directory, file]]):
+            self.set_arguments()
+            self.args = self.parser.parse_args()
+
+        if port is None:
+            self.port = self.args.port
+        else:
+            self.port = port
+
+        if host is None:
+            self.host = self.args.host
+        else:
+            self.host = host
+
+        if directory is None:
+            self.directory = self.args.directory
+        else:
+            self.directory = directory
+
+        if file is None:
+            self.file = self.args.file
+        else:
+            self.file = file
+
+        if self.file is None:
+            raise ValueError("File name is required")
+
+        if self.directory is None:
+            self.directory = Path(__file__).parent
 
     def setup_routes(self):
         """
