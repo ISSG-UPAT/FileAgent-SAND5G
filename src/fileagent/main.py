@@ -1,15 +1,16 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from pathlib import Path
-import os
 import json
 import re
 import uvicorn
 import argparse
 import datetime
+import sys
 
 
 class FileAgent:
-    def __init__(self):
+    def __init__(self, port: int = None, host: str = None, file: str = None):
+
         self.set_arguments()
         self.app = FastAPI()
         self.internal_path = Path(__file__).parent.parent
@@ -33,14 +34,14 @@ class FileAgent:
             "--port",
             type=int,
             default=8000,
-            help="Path to the data directory",
+            help="Port to run the fastapi server on",
         )
 
         self.parser.add_argument(
             "--host",
             type=str,
             default="0.0.0.0",
-            help="Path to the data directory",
+            help="Host of the fastapi server",
         )
 
         self.parser.add_argument(
@@ -48,12 +49,21 @@ class FileAgent:
             "--file",
             type=str,
             default="mock.local.rules",
+            help="Path to the file",
+        )
+
+        self.parser.add_argument(
+            "-d",
+            "--dir",
+            type=str,
+            default=None,
             help="Path to the data directory",
         )
 
         self.args = self.parser.parse_args()
         self.port = self.args.port
         self.host = self.args.host
+        self.file = self.args.file
 
     def setup_routes(self):
         """

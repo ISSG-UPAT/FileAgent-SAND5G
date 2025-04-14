@@ -1,9 +1,5 @@
 # FileAgent
 
-```toc
-
-```
-
 ## About
 
 This repository is part of the SAND5G project, which aims to enhance security in 5G networks. FileAgent is a tool designed to facilitate the management of Snort rules in a containerized environment.
