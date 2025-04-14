@@ -6,7 +6,6 @@ class Example(FileAgent):
         super().__init__()
 
 
-
 if __name__ == "__main__":
     agent = FileAgent()
     agent.main()

@@ -67,31 +67,55 @@ class FileAgent:
             help="Path to the data directory",
         )
 
+    def assign_attributes(self, attributes):
+        """
+        Assign attributes dynamically based on provided arguments or defaults.
+
+        Args:
+            attributes (dict): A dictionary where keys are attribute names and values are tuples
+                            of (provided_value, default_value).
+        """
+        for attr, (provided_value, default_value) in attributes.items():
+            setattr(
+                self,
+                attr,
+                provided_value if provided_value is not None else default_value,
+            )
+
     def default_values(self, port, host, directory, file):
 
         if any([arg is None for arg in [port, host, directory, file]]):
             self.set_arguments()
             self.args = self.parser.parse_args()
 
-        if port is None:
-            self.port = self.args.port
-        else:
-            self.port = port
+        attributes = {
+            "port": (port, self.args.port),
+            "host": (host, self.args.host),
+            "directory": (directory, self.args.directory),
+            "file": (file, self.args.file),
+        }
 
-        if host is None:
-            self.host = self.args.host
-        else:
-            self.host = host
+        self.assign_attributes(attributes)
 
-        if directory is None:
-            self.directory = self.args.directory
-        else:
-            self.directory = directory
+        # if port is None:
+        #     self.port = self.args.port
+        # else:
+        #     self.port = port
 
-        if file is None:
-            self.file = self.args.file
-        else:
-            self.file = file
+        # if host is None:
+        #     self.host = self.args.host
+        # else:
+        #     self.host = host
+
+        # if directory is None:
+        #     self.directory = self.args.directory
+        # else:
+        #     self.directory = directory
+
+        # if file is None:
+        #     self.file = self.args.file
+        # else:
+        #     self.file = file
 
         if self.file is None:
             raise ValueError("File name is required")
