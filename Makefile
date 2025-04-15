@@ -5,13 +5,21 @@ SHELL := /bin/bash
 
 all: setup-all-dev
 
+
+
 setup-toml: 
 	@source $(VENV_DIR)/bin/activate && pip install --editable . 
 
 
 # Virtual environment functions 
 
-create-venv:
+$(VENV_DIR):
+	@mkdir -p $(VENV_DIR)
+	@echo "*" > $(VENV_DIR)/.gitignore 
+	@echo "Created virtual environment directory $(VENV_DIR)"
+
+
+create-venv: $(VENV_DIR)
 	@$(PYTHON) -m venv $(VENV_DIR) 
 	@echo "Virtual environment created in $(VENV_DIR)"
 
@@ -68,6 +76,7 @@ PDOC_DIR=docs/pdoc/
 $(PDOC_DIR):
 	@mkdir -p $(PDOC_DIR)
 	@echo "Created documentation directory $(PDOC_DIR)"
+
 
 
 doc-pdoc: $(PDOC_DIR)
