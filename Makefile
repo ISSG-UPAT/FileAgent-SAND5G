@@ -9,6 +9,8 @@ all: install
 # ║ Virtual Environment Functions ║
 # ╚═══════════════════════════════╝
 
+
+# Creates the virtual envirnoment folder and immediately gives them a gitignore
 $(VENV_DIR):
 	@mkdir -p $(VENV_DIR)
 	@echo "*" > $(VENV_DIR)/.gitignore 
@@ -90,12 +92,13 @@ build-check:
 # ╚═══════════════════╝
 
 
-# 
-# NOT YET IMPLEMENTED 
+
 upload:
+	@echo "To upload, it will need to authenticate the credentials"
 	@source $(VENV_DIR)/bin/activate  && twine upload dist/*
 
 upload-test:
+	@echo "To upload, it will need to authenticate the credentials"
 	@source $(VENV_DIR)/bin/activate  && twine upload -r testpypi dist/*
 	@echo "Uploaded to Test PyPI."
 

@@ -37,3 +37,7 @@ Homepage = "https://github.com/ISSG-Projects/FileAgentSAND5G"
 [tool.setuptools]
 packages = ["fileagent"]
 package-dir = {"" = "src"}
+
+
+[project.scripts]
+fileagent-cli = "fileagent.__main__:main"
