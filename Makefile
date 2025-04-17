@@ -87,6 +87,12 @@ build-check:
 
 
 
+build-clean: 
+	@rm -rf dist/* 
+	@echo "Cleaned up the dist directory."
+
+
+
 # ╔═══════════════════╗
 # ║ Upload Functions  ║
 # ╚═══════════════════╝

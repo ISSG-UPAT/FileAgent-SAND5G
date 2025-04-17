@@ -1,2 +1,2 @@
 [console_scripts]
-fileagent-cli = fileagent.__main__:main
+fileagent = fileagent.__main__:main

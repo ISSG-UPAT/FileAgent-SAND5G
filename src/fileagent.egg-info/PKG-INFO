@@ -29,9 +29,6 @@ Keywords: fileagent,api
 Requires-Python: >=3.11
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: build>=0.7.0
-Requires-Dist: setuptools>=67.7.0
-Requires-Dist: wheel>0.37.0
 Requires-Dist: fastapi>=0.110.0
 Requires-Dist: uvicorn>=0.34.0
 Requires-Dist: requests>=2.30.0
