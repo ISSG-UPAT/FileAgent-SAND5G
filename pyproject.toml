@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fileagent"
-version = "0.1.2" 
+version = "0.1.3" 
 description = "Python fileagent to accompany Snort in a container"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -17,6 +17,9 @@ keywords = [
     "api",
 ]
 dependencies = [
+    
+    "setuptools>=67.7.0",
+    "wheel>=0.37.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.34.0",
     "requests>=2.30.0",
