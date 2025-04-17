@@ -56,11 +56,25 @@ setup-all-dev: create-venv venv-upgrade-pip setup-toml install-pack-dev install-
 	@echo "All development setup steps completed."
 
 
+# Build source distribution and wheel using pyproject.toml
+build:
+	@source $(VENV_DIR)/bin/activate && python -m build --sdist --wheel
+	@echo "Source distribution and wheel built."
+	@echo "Build completed."
+
+build-check: 
+	@source $(VENV_DIR)/bin/activate && python -m twine check dist/*
+	@echo "Source distribution with twine check."
+	@echo "Build check completed."
+
 # Upload to py
 # NOT YET IMPLEMENTED 
 upload-pypi:
 	@source $(VENV_DIR)/bin/activate  && twine upload dist/*
 
+upload-test:
+	@source $(VENV_DIR)/bin/activate  && twine upload -r testpypi dist/*
+	@echo "Uploaded to Test PyPI."
 
 # Testing 
 

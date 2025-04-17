@@ -10,9 +10,7 @@ python-multipart>=0.0.20
 pytest>=6.2.4
 twine>=3.4.2
 pipdeptree>=2.0.0
+httpx>0.24.0
 
 [docs]
 pdoc3>=0.11.4
-
-[test]
-unittest2>=1.1.0

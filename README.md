@@ -35,6 +35,8 @@ FileAgent is a Python-based application designed to accompany Snort in a contain
 
 ## Installation
 
+### Clone from github
+
 1. Clone the repository:
 
    ```bash
@@ -46,12 +48,6 @@ FileAgent is a Python-based application designed to accompany Snort in a contain
 
    ```bash
    python -m venv venv
-   ```
-
-   or
-
-   ```bash
-   make create-venv
    ```
 
 3. Activate the virtual environment:
@@ -70,20 +66,14 @@ FileAgent is a Python-based application designed to accompany Snort in a contain
 4. Install the required dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   pip install .
    ```
 
-   or
+### pip install from github
 
-   ```bash
-   make install
-   ```
-
-5. Run the FastAPI application:
-
-   ```bash
-
-   ```
+```bash
+pip install git+ssh://git@github.com/ISSG-Projects/FileAgentSAND5G.git
+```
 
 ## API Endpoints
 
@@ -93,17 +83,9 @@ FileAgent is a Python-based application designed to accompany Snort in a contain
 
 The project documentation is generated using pdoc3. To generate and view the documentation:
 
-```bash
-make docs-pdoc
-```
-
 Open the generated HTML files in the `docs` directory.
 
-Open the generated HTML files in the browser
-
-```bash
-make docs-pdoc-host
-```
+More information at [docs/pdoc/README.md](docs/pdoc/README.md).
 
 Additionally the FastAPI framework provides an interactive API documentation at `http://localhost:8000/docs` when the application is running. This allows you to test the API endpoints directly from your browser.
 
