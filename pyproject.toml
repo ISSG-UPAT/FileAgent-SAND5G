@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=64", "wheel", "build"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -17,9 +17,6 @@ keywords = [
     "api",
 ]
 dependencies = [
-    "build>=0.7.0",
-    "setuptools>=67.7.0",
-    "wheel>0.37.0",
     "fastapi>=0.110.0",
     "uvicorn>=0.34.0",
     "requests>=2.30.0",
@@ -40,4 +37,4 @@ package-dir = {"" = "src"}
 
 
 [project.scripts]
-fileagent-cli = "fileagent.__main__:main"
+fileagent = "fileagent.__main__:main"
