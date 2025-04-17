@@ -3,10 +3,12 @@ MANIFEST.in
 README.md
 pyproject.toml
 src/fileagent/__init__.py
+src/fileagent/__main__.py
 src/fileagent/main.py
 src/fileagent.egg-info/PKG-INFO
 src/fileagent.egg-info/SOURCES.txt
 src/fileagent.egg-info/dependency_links.txt
+src/fileagent.egg-info/entry_points.txt
 src/fileagent.egg-info/requires.txt
 src/fileagent.egg-info/top_level.txt
 tests/test_fileagent.py

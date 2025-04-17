@@ -99,7 +99,7 @@ upload:
 
 upload-test:
 	@echo "To upload, it will need to authenticate the credentials"
-	@source $(VENV_DIR)/bin/activate  && twine upload -r testpypi dist/*
+	@source $(VENV_DIR)/bin/activate  && twine upload -r testpypi --verbose dist/fileagent-$(VERSION)* 
 	@echo "Uploaded to Test PyPI."
 
 
