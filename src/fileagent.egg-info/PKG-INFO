@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: fileagent
-Version: 0.1.3
+Version: 0.1.4
 Summary: Python fileagent to accompany Snort in a container
 Author: Nikolas Filippatos
 License: MIT License
@@ -24,7 +24,7 @@ License: MIT License
         LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
         OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
         SOFTWARE.
-Project-URL: Homepage, https://github.com/ISSG-Projects/FileAgentSAND5G
+Project-URL: Homepage, https://github.com/ISSG-UPAT/FileAgent-SAND5G
 Keywords: fileagent,api
 Requires-Python: >=3.11
 Description-Content-Type: text/markdown
