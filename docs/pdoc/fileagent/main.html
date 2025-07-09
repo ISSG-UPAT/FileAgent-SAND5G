@@ -48,643 +48,200 @@ el.replaceWith(d);
 <dl>
 <dt id="fileagent.main.FileAgent"><code class="flex name class">
 <span>class <span class="ident">FileAgent</span></span>
+<span>(</span><span>*args, **kwargs)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class FileAgent:
-    def __init__(self):
-        self.set_arguments()
-        self.app = FastAPI()
-        self.internal_path = Path(__file__).parent.parent
-        # For non docker usage
-        self.internal_path = Path(self.internal_path.parent, &#34;snort&#34;, &#34;volumes&#34;)
-        self.data_path = Path(self.internal_path, &#34;custom&#34;)
-        self.data_backup_path = Path(self.data_path, &#34;backup&#34;)
-        self.rules_file = Path(self.data_path, self.args.file)
+<pre><code class="python">class FileAgent(ManagerAPI, ManagerArguments, ManagerFiles, ManagerSnort):
+    def __init__(self, *args, **kwargs):
+        # The arguments are handled by the Inheritance of the ManagerArguments class
 
-        self.setup_routes()
+        # The default values are assigned. The default values for now are inside the ManagerArgument class, per argument.
+        self.default_values(**kwargs)
 
-    def set_arguments(self):
+        # TODO: Add a universal config file
+
+        # Initialize the ManagerFiles class
+        # This entails more variables assigned, needed for the envisioned structured of the project
+        ManagerFiles.__init__(self, *args, **kwargs)
+
+        # Handle the api
+        ManagerAPI.__init__(self, *args, **kwargs)
+
+    def default_values(self, **kwargs):
         &#34;&#34;&#34;
         Description:
-            Set the arguments for the agent, and save the important information as attributes of the class
-        &#34;&#34;&#34;
+            This function is meant to be run by the init function of the class
+            Set the default values for the agent
+            This function sets the default values for the agent. It checks if the arguments passed to the Class are None, and calls the arguments from argparse.
+            If the arguments are not None, it assigns the values to the attribute of the class.
+            If the directory is None, it sets the directory to the parent of the file.
+            It also checks if the file is None, and raises a ValueError if it is.
 
-        self.parser = argparse.ArgumentParser()
-        self.parser.add_argument(
-            &#34;-p&#34;,
-            &#34;--port&#34;,
-            type=int,
-            default=8000,
-            help=&#34;Path to the data directory&#34;,
-        )
-
-        self.parser.add_argument(
-            &#34;--host&#34;,
-            type=str,
-            default=&#34;0.0.0.0&#34;,
-            help=&#34;Path to the data directory&#34;,
-        )
-
-        self.parser.add_argument(
-            &#34;-f&#34;,
-            &#34;--file&#34;,
-            type=str,
-            default=&#34;mock.local.rules&#34;,
-            help=&#34;Path to the data directory&#34;,
-        )
-
-        self.args = self.parser.parse_args()
-        self.port = self.args.port
-        self.host = self.args.host
-
-    def setup_routes(self):
-        &#34;&#34;&#34;
-        Description:
-            Setup the routes for the agent
+        Args:
+            port (int): Port to run the fastapi server on
+            host (str): Host of the fastapi server
+            directory (str): Path to the data directory
+            file (str): Path to the file
 
         Raises:
-            HTTPException:
-            HTTPException: _description_
-            HTTPException: _description_
-
-        Returns:
-            _type_: _description_
+            ValueError: File name is required
         &#34;&#34;&#34;
+        if any(value is None for value in kwargs.values()) or len(kwargs) == 0:
+            self.set_arguments()
+            self.args = self.parser.parse_args()
 
-        @self.app.post(&#34;/upload&#34;)
-        async def upload_file(file: UploadFile = File(...)):
-            if not file:
-                raise HTTPException(
-                    status_code=400, detail=&#34;No file part in the request&#34;
-                )
+        attributes = {
+            &#34;port&#34;: (kwargs.get(&#34;port&#34;), self.args.port),
+            &#34;host&#34;: (kwargs.get(&#34;host&#34;), self.args.host),
+            &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), self.args.directory),
+            &#34;file&#34;: (kwargs.get(&#34;file&#34;), self.args.file),
+        }
 
-            if file.filename == &#34;&#34;:
-                raise HTTPException(status_code=400, detail=&#34;No file selected&#34;)
+        self.assign_attributes(attributes)
 
-            content = await file.read()
-            content_str = content.decode(&#34;utf-8&#34;)
+        if self.file is None:
+            raise ValueError(&#34;File name is required&#34;)
 
-            if file.content_type == &#34;application/json&#34;:
-                self.append_rule(
-                    {&#34;content_type&#34;: &#34;application/json&#34;, &#34;content&#34;: content_str}
-                )
-                return {&#34;message&#34;: &#34;JSON file received&#34;, &#34;content&#34;: content_str}
-            elif file.content_type == &#34;text/plain&#34;:
-                self.append_rule({&#34;content_type&#34;: &#34;text/plain&#34;, &#34;content&#34;: content_str})
-                return {&#34;message&#34;: &#34;Text file received&#34;, &#34;content&#34;: content_str}
-            else:
-                raise HTTPException(status_code=400, detail=&#34;Unsupported file type&#34;)
-
-    def ip_matches(self, data: str) -&gt; str:
-        &#34;&#34;&#34;
-        Description:
-            Check if the data contains an ip address. Checks for ipv4, ipv6 and url
-
-        Args:
-            data (str): Data to be checked for ip address
-
-        Returns:
-            str: the ip/url regex matching case
-        &#34;&#34;&#34;
-        ipv4_pattern = r&#34;\b(?:\d{1,3}\.){3}\d{1,3}\b&#34;
-        ipv6_pattern = r&#34;\b(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}\b&#34;
-        url_pattern = r&#34;\bhttps?://[^\s/$.?#].[^\s]*\b&#34;
-
-        for pattern in [ipv4_pattern, ipv6_pattern, url_pattern]:
-            match = re.search(pattern, data)
-            if match:
-                return match.group(0)
-        return None
-
-    def rule_translator(self, data: dict) -&gt; str:
-        &#34;&#34;&#34;
-        Description:
-            Translate the data into a rule
-            Right now this is a simple implementation
-            Checks if it is a json or text file and extracts the ip address
-
-        Args:
-            data (dict): Data from the post request to be translated into a rule,
-
-        Returns:
-            str: Rule to be appended to the rules file
-        &#34;&#34;&#34;
-
-        if data.get(&#34;content_type&#34;) == &#34;application/json&#34;:
-            data = json.loads(data.get(&#34;content&#34;))
-            rule = f&#34;block {data.get(&#39;ip&#39;)}&#34;
-        elif data.get(&#34;content_type&#34;) == &#34;text/plain&#34;:
-            ip = self.ip_matches(data.get(&#34;content&#34;))
-            if ip is None:
-                return None
-            # rule = f&#34;block {ip}&#34;
-            rule = f&#34;&#34;&#34;alert ip {ip} any -&gt; $HOME_NET any (msg: &#34;IP Alert Incoming From IP: {ip}&#34;;   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)&#34;&#34;&#34;
-
-        return rule
-
-    def append_rule(self, data):
-        &#34;&#34;&#34;
-        Description:
-        Append rule to the local.rules
-
-        Args:
-            data (str): Data to be appended to the local.rules file
-        &#34;&#34;&#34;
-
-        # Right now this is just a simple implementation
-
-        rule = self.rule_translator(data)
-        if rule is None:
-            return
-
-        if self.rule_exists(rule):
-            return
-
-        print(f&#34;Appending rule: {rule}&#34;)
-        # Backup the rules file
-        self.file_backup()
-
-        # Append the rule to the rules file
-        with open(self.rules_file, &#34;a&#34;) as file:
-            file.write(f&#34;\n{rule}\n&#34;)
-
-    def rule_exists(self, rule):
-        &#34;&#34;&#34;
-        Description:
-            Check if the rule already exists in the rules file
-            This function reads the rules file line by line and determines if the
-            provided rule is present in any of the lines. It is useful for avoiding
-            duplicate entries in the rules file.
-
-        Args:
-            rule (str): Rule to be checked
-
-        Returns:
-            bool: True if the rule exists, False otherwise
-        &#34;&#34;&#34;
-
-        with open(self.rules_file, &#34;r&#34;) as file:
-            rules = file.readlines()
-            if any(rule in rule_line for rule_line in rules):
-                return True
-            return False
-
-    def file_backup(self):
-        &#34;&#34;&#34;
-        Description:
-            -----------
-
-            Creates a backup of the rules file in the specified backup directory.
-            This method ensures that the backup directory exists, then creates a backup
-            of the `self.rules_file` by copying its contents to a new file in the backup
-            directory. The backup file is named using the original file&#39;s stem and the
-            current timestamp in the format &#39;YYYY-MM-DD_HH-MM-SS.bak&#39;.
-            Steps:
-            1. Ensures the backup directory (`self.data_backup_path`) exists.
-            2. Constructs the backup file path using the original file&#39;s stem and a timestamp.
-            3. Reads the contents of the `self.rules_file`.
-            4. Writes the contents to the newly created backup file.
-            Raises:
-                FileNotFoundError: If `self.rules_file` does not exist.
-                IOError: If there is an issue reading from or writing to the files.
-            Note:
-                - The method assumes `self.rules_file` and `self.data_backup_path` are
-                valid `Path` objects.
-                - The timestamp ensures that each backup file has a unique name.
-
-        Raises:
-            FileNotFoundError: If `self.rules_file` does not exist.
-            IOError: If there is an issue reading from or writing to the files.
-
-        &#34;&#34;&#34;
-
-        # Copy the self.rules_file to the backup directory with the name filename-time.bak
-        # Ensure the backup directory exists
-        self.data_backup_path.mkdir(parents=True, exist_ok=True)
-        print(f&#34;Creating backup in {self.data_backup_path}&#34;)
-        # Create the backup file path
-        backup_file = Path(
-            self.data_backup_path,
-            f&#34;{self.rules_file.stem}-{datetime.datetime.now().strftime(&#39;%Y-%m-%d_%H-%M-%S&#39;)}.bak&#34;,
-        )
-        with open(self.rules_file, &#34;r&#34;) as file:
-            rules = file.readlines()
-
-            with open(backup_file, &#34;w&#34;) as file:
-                file.writelines(rules)
-
-    def main(self):
-        &#34;&#34;&#34;
-        Description
-        -----------
-        Main function to run the agent
-
-        Parameters
-        ----------
-        None
-        &#34;&#34;&#34;
-        uvicorn.run(self.app, host=self.host, port=self.port)</code></pre>
+        if self.directory is None:
+            self.directory = self.get_parent()</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><p>Initializes the API class with the given parameters.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>*args</code></strong></dt>
+<dd>Variable length argument list.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>Arbitrary keyword arguments. Expected keys include:
+- "port" (int): The port number on which the API will run.
+- "host" (str): The host address for the API.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>port</code></strong> :&ensp;<code>int</code></dt>
+<dd>The port number on which the API will run.</dd>
+<dt><strong><code>host</code></strong> :&ensp;<code>str</code></dt>
+<dd>The host address for the API.</dd>
+<dt><strong><code>app</code></strong> :&ensp;<code>FastAPI</code></dt>
+<dd>The FastAPI application instance.</dd>
+</dl>
+<h2 id="calls">Calls</h2>
+<p>setup_routes: Method to set up the API routes.</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="fileagent.managers.manager_api.ManagerAPI" href="managers/manager_api.html#fileagent.managers.manager_api.ManagerAPI">ManagerAPI</a></li>
+<li><a title="fileagent.managers.manager_arguments.ManagerArguments" href="managers/manager_arguments.html#fileagent.managers.manager_arguments.ManagerArguments">ManagerArguments</a></li>
+<li><a title="fileagent.managers.manager_files.ManagerFiles" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles">ManagerFiles</a></li>
+<li><a title="fileagent.managers.manager_snort.ManagerSnort" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort">ManagerSnort</a></li>
+</ul>
 <h3>Methods</h3>
 <dl>
-<dt id="fileagent.main.FileAgent.append_rule"><code class="name flex">
-<span>def <span class="ident">append_rule</span></span>(<span>self, data)</span>
+<dt id="fileagent.main.FileAgent.default_values"><code class="name flex">
+<span>def <span class="ident">default_values</span></span>(<span>self, **kwargs)</span>
 </code></dt>
 <dd>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def append_rule(self, data):
+<pre><code class="python">def default_values(self, **kwargs):
     &#34;&#34;&#34;
     Description:
-    Append rule to the local.rules
+        This function is meant to be run by the init function of the class
+        Set the default values for the agent
+        This function sets the default values for the agent. It checks if the arguments passed to the Class are None, and calls the arguments from argparse.
+        If the arguments are not None, it assigns the values to the attribute of the class.
+        If the directory is None, it sets the directory to the parent of the file.
+        It also checks if the file is None, and raises a ValueError if it is.
 
     Args:
-        data (str): Data to be appended to the local.rules file
-    &#34;&#34;&#34;
-
-    # Right now this is just a simple implementation
-
-    rule = self.rule_translator(data)
-    if rule is None:
-        return
-
-    if self.rule_exists(rule):
-        return
-
-    print(f&#34;Appending rule: {rule}&#34;)
-    # Backup the rules file
-    self.file_backup()
-
-    # Append the rule to the rules file
-    with open(self.rules_file, &#34;a&#34;) as file:
-        file.write(f&#34;\n{rule}\n&#34;)</code></pre>
-</details>
-<div class="desc"><p>Description:
-Append rule to the local.rules</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>data</code></strong> :&ensp;<code>str</code></dt>
-<dd>Data to be appended to the local.rules file</dd>
-</dl></div>
-</dd>
-<dt id="fileagent.main.FileAgent.file_backup"><code class="name flex">
-<span>def <span class="ident">file_backup</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def file_backup(self):
-    &#34;&#34;&#34;
-    Description:
-        -----------
-
-        Creates a backup of the rules file in the specified backup directory.
-        This method ensures that the backup directory exists, then creates a backup
-        of the `self.rules_file` by copying its contents to a new file in the backup
-        directory. The backup file is named using the original file&#39;s stem and the
-        current timestamp in the format &#39;YYYY-MM-DD_HH-MM-SS.bak&#39;.
-        Steps:
-        1. Ensures the backup directory (`self.data_backup_path`) exists.
-        2. Constructs the backup file path using the original file&#39;s stem and a timestamp.
-        3. Reads the contents of the `self.rules_file`.
-        4. Writes the contents to the newly created backup file.
-        Raises:
-            FileNotFoundError: If `self.rules_file` does not exist.
-            IOError: If there is an issue reading from or writing to the files.
-        Note:
-            - The method assumes `self.rules_file` and `self.data_backup_path` are
-            valid `Path` objects.
-            - The timestamp ensures that each backup file has a unique name.
+        port (int): Port to run the fastapi server on
+        host (str): Host of the fastapi server
+        directory (str): Path to the data directory
+        file (str): Path to the file
 
     Raises:
-        FileNotFoundError: If `self.rules_file` does not exist.
-        IOError: If there is an issue reading from or writing to the files.
-
+        ValueError: File name is required
     &#34;&#34;&#34;
+    if any(value is None for value in kwargs.values()) or len(kwargs) == 0:
+        self.set_arguments()
+        self.args = self.parser.parse_args()
 
-    # Copy the self.rules_file to the backup directory with the name filename-time.bak
-    # Ensure the backup directory exists
-    self.data_backup_path.mkdir(parents=True, exist_ok=True)
-    print(f&#34;Creating backup in {self.data_backup_path}&#34;)
-    # Create the backup file path
-    backup_file = Path(
-        self.data_backup_path,
-        f&#34;{self.rules_file.stem}-{datetime.datetime.now().strftime(&#39;%Y-%m-%d_%H-%M-%S&#39;)}.bak&#34;,
-    )
-    with open(self.rules_file, &#34;r&#34;) as file:
-        rules = file.readlines()
+    attributes = {
+        &#34;port&#34;: (kwargs.get(&#34;port&#34;), self.args.port),
+        &#34;host&#34;: (kwargs.get(&#34;host&#34;), self.args.host),
+        &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), self.args.directory),
+        &#34;file&#34;: (kwargs.get(&#34;file&#34;), self.args.file),
+    }
 
-        with open(backup_file, &#34;w&#34;) as file:
-            file.writelines(rules)</code></pre>
+    self.assign_attributes(attributes)
+
+    if self.file is None:
+        raise ValueError(&#34;File name is required&#34;)
+
+    if self.directory is None:
+        self.directory = self.get_parent()</code></pre>
 </details>
 <div class="desc"><h2 id="description">Description</h2>
-<hr>
-<p>Creates a backup of the rules file in the specified backup directory.
-This method ensures that the backup directory exists, then creates a backup
-of the <code>self.rules_file</code> by copying its contents to a new file in the backup
-directory. The backup file is named using the original file's stem and the
-current timestamp in the format 'YYYY-MM-DD_HH-MM-SS.bak'.
-Steps:
-1. Ensures the backup directory (<code>self.data_backup_path</code>) exists.
-2. Constructs the backup file path using the original file's stem and a timestamp.
-3. Reads the contents of the <code>self.rules_file</code>.
-4. Writes the contents to the newly created backup file.
-Raises:
-FileNotFoundError: If <code>self.rules_file</code> does not exist.
-IOError: If there is an issue reading from or writing to the files.
-Note:
-- The method assumes <code>self.rules_file</code> and <code>self.data_backup_path</code> are
-valid <code>Path</code> objects.
-- The timestamp ensures that each backup file has a unique name.</p>
+<p>This function is meant to be run by the init function of the class
+Set the default values for the agent
+This function sets the default values for the agent. It checks if the arguments passed to the Class are None, and calls the arguments from argparse.
+If the arguments are not None, it assigns the values to the attribute of the class.
+If the directory is None, it sets the directory to the parent of the file.
+It also checks if the file is None, and raises a ValueError if it is.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>port</code></strong> :&ensp;<code>int</code></dt>
+<dd>Port to run the fastapi server on</dd>
+<dt><strong><code>host</code></strong> :&ensp;<code>str</code></dt>
+<dd>Host of the fastapi server</dd>
+<dt><strong><code>directory</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the data directory</dd>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
+<dd>Path to the file</dd>
+</dl>
 <h2 id="raises">Raises</h2>
 <dl>
-<dt><code>FileNotFoundError</code></dt>
-<dd>If <code>self.rules_file</code> does not exist.</dd>
-<dt><code>IOError</code></dt>
-<dd>If there is an issue reading from or writing to the files.</dd>
-</dl></div>
-</dd>
-<dt id="fileagent.main.FileAgent.ip_matches"><code class="name flex">
-<span>def <span class="ident">ip_matches</span></span>(<span>self, data: str) ‑> str</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def ip_matches(self, data: str) -&gt; str:
-    &#34;&#34;&#34;
-    Description:
-        Check if the data contains an ip address. Checks for ipv4, ipv6 and url
-
-    Args:
-        data (str): Data to be checked for ip address
-
-    Returns:
-        str: the ip/url regex matching case
-    &#34;&#34;&#34;
-    ipv4_pattern = r&#34;\b(?:\d{1,3}\.){3}\d{1,3}\b&#34;
-    ipv6_pattern = r&#34;\b(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}\b&#34;
-    url_pattern = r&#34;\bhttps?://[^\s/$.?#].[^\s]*\b&#34;
-
-    for pattern in [ipv4_pattern, ipv6_pattern, url_pattern]:
-        match = re.search(pattern, data)
-        if match:
-            return match.group(0)
-    return None</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Check if the data contains an ip address. Checks for ipv4, ipv6 and url</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>data</code></strong> :&ensp;<code>str</code></dt>
-<dd>Data to be checked for ip address</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>str</code></dt>
-<dd>the ip/url regex matching case</dd>
-</dl></div>
-</dd>
-<dt id="fileagent.main.FileAgent.main"><code class="name flex">
-<span>def <span class="ident">main</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def main(self):
-    &#34;&#34;&#34;
-    Description
-    -----------
-    Main function to run the agent
-
-    Parameters
-    ----------
-    None
-    &#34;&#34;&#34;
-    uvicorn.run(self.app, host=self.host, port=self.port)</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Main function to run the agent</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>None</code></strong></dt>
-<dd>&nbsp;</dd>
-</dl></div>
-</dd>
-<dt id="fileagent.main.FileAgent.rule_exists"><code class="name flex">
-<span>def <span class="ident">rule_exists</span></span>(<span>self, rule)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def rule_exists(self, rule):
-    &#34;&#34;&#34;
-    Description:
-        Check if the rule already exists in the rules file
-        This function reads the rules file line by line and determines if the
-        provided rule is present in any of the lines. It is useful for avoiding
-        duplicate entries in the rules file.
-
-    Args:
-        rule (str): Rule to be checked
-
-    Returns:
-        bool: True if the rule exists, False otherwise
-    &#34;&#34;&#34;
-
-    with open(self.rules_file, &#34;r&#34;) as file:
-        rules = file.readlines()
-        if any(rule in rule_line for rule_line in rules):
-            return True
-        return False</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Check if the rule already exists in the rules file
-This function reads the rules file line by line and determines if the
-provided rule is present in any of the lines. It is useful for avoiding
-duplicate entries in the rules file.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>rule</code></strong> :&ensp;<code>str</code></dt>
-<dd>Rule to be checked</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>bool</code></dt>
-<dd>True if the rule exists, False otherwise</dd>
-</dl></div>
-</dd>
-<dt id="fileagent.main.FileAgent.rule_translator"><code class="name flex">
-<span>def <span class="ident">rule_translator</span></span>(<span>self, data: dict) ‑> str</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def rule_translator(self, data: dict) -&gt; str:
-    &#34;&#34;&#34;
-    Description:
-        Translate the data into a rule
-        Right now this is a simple implementation
-        Checks if it is a json or text file and extracts the ip address
-
-    Args:
-        data (dict): Data from the post request to be translated into a rule,
-
-    Returns:
-        str: Rule to be appended to the rules file
-    &#34;&#34;&#34;
-
-    if data.get(&#34;content_type&#34;) == &#34;application/json&#34;:
-        data = json.loads(data.get(&#34;content&#34;))
-        rule = f&#34;block {data.get(&#39;ip&#39;)}&#34;
-    elif data.get(&#34;content_type&#34;) == &#34;text/plain&#34;:
-        ip = self.ip_matches(data.get(&#34;content&#34;))
-        if ip is None:
-            return None
-        # rule = f&#34;block {ip}&#34;
-        rule = f&#34;&#34;&#34;alert ip {ip} any -&gt; $HOME_NET any (msg: &#34;IP Alert Incoming From IP: {ip}&#34;;   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)&#34;&#34;&#34;
-
-    return rule</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Translate the data into a rule
-Right now this is a simple implementation
-Checks if it is a json or text file and extracts the ip address</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Data from the post request to be translated into a rule,</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>str</code></dt>
-<dd>Rule to be appended to the rules file</dd>
-</dl></div>
-</dd>
-<dt id="fileagent.main.FileAgent.set_arguments"><code class="name flex">
-<span>def <span class="ident">set_arguments</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def set_arguments(self):
-    &#34;&#34;&#34;
-    Description:
-        Set the arguments for the agent, and save the important information as attributes of the class
-    &#34;&#34;&#34;
-
-    self.parser = argparse.ArgumentParser()
-    self.parser.add_argument(
-        &#34;-p&#34;,
-        &#34;--port&#34;,
-        type=int,
-        default=8000,
-        help=&#34;Path to the data directory&#34;,
-    )
-
-    self.parser.add_argument(
-        &#34;--host&#34;,
-        type=str,
-        default=&#34;0.0.0.0&#34;,
-        help=&#34;Path to the data directory&#34;,
-    )
-
-    self.parser.add_argument(
-        &#34;-f&#34;,
-        &#34;--file&#34;,
-        type=str,
-        default=&#34;mock.local.rules&#34;,
-        help=&#34;Path to the data directory&#34;,
-    )
-
-    self.args = self.parser.parse_args()
-    self.port = self.args.port
-    self.host = self.args.host</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Set the arguments for the agent, and save the important information as attributes of the class</p></div>
-</dd>
-<dt id="fileagent.main.FileAgent.setup_routes"><code class="name flex">
-<span>def <span class="ident">setup_routes</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def setup_routes(self):
-    &#34;&#34;&#34;
-    Description:
-        Setup the routes for the agent
-
-    Raises:
-        HTTPException:
-        HTTPException: _description_
-        HTTPException: _description_
-
-    Returns:
-        _type_: _description_
-    &#34;&#34;&#34;
-
-    @self.app.post(&#34;/upload&#34;)
-    async def upload_file(file: UploadFile = File(...)):
-        if not file:
-            raise HTTPException(
-                status_code=400, detail=&#34;No file part in the request&#34;
-            )
-
-        if file.filename == &#34;&#34;:
-            raise HTTPException(status_code=400, detail=&#34;No file selected&#34;)
-
-        content = await file.read()
-        content_str = content.decode(&#34;utf-8&#34;)
-
-        if file.content_type == &#34;application/json&#34;:
-            self.append_rule(
-                {&#34;content_type&#34;: &#34;application/json&#34;, &#34;content&#34;: content_str}
-            )
-            return {&#34;message&#34;: &#34;JSON file received&#34;, &#34;content&#34;: content_str}
-        elif file.content_type == &#34;text/plain&#34;:
-            self.append_rule({&#34;content_type&#34;: &#34;text/plain&#34;, &#34;content&#34;: content_str})
-            return {&#34;message&#34;: &#34;Text file received&#34;, &#34;content&#34;: content_str}
-        else:
-            raise HTTPException(status_code=400, detail=&#34;Unsupported file type&#34;)</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Setup the routes for the agent</p>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt>HTTPException:</dt>
-<dt><code>HTTPException</code></dt>
-<dd><em>description</em></dd>
-<dt><code>HTTPException</code></dt>
-<dd><em>description</em></dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>_type_</code></dt>
-<dd><em>description</em></dd>
+<dt><code>ValueError</code></dt>
+<dd>File name is required</dd>
 </dl></div>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="fileagent.managers.manager_api.ManagerAPI" href="managers/manager_api.html#fileagent.managers.manager_api.ManagerAPI">ManagerAPI</a></b></code>:
+<ul class="hlist">
+<li><code><a title="fileagent.managers.manager_api.ManagerAPI.run_uvicorn" href="managers/manager_api.html#fileagent.managers.manager_api.ManagerAPI.run_uvicorn">run_uvicorn</a></code></li>
+<li><code><a title="fileagent.managers.manager_api.ManagerAPI.setup_routes" href="managers/manager_api.html#fileagent.managers.manager_api.ManagerAPI.setup_routes">setup_routes</a></code></li>
+<li><code><a title="fileagent.managers.manager_api.ManagerAPI.upload_functionality" href="managers/manager_api.html#fileagent.managers.manager_api.ManagerAPI.upload_functionality">upload_functionality</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="fileagent.managers.manager_arguments.ManagerArguments" href="managers/manager_arguments.html#fileagent.managers.manager_arguments.ManagerArguments">ManagerArguments</a></b></code>:
+<ul class="hlist">
+<li><code><a title="fileagent.managers.manager_arguments.ManagerArguments.assign_attributes" href="managers/manager_arguments.html#fileagent.managers.manager_arguments.ManagerArguments.assign_attributes">assign_attributes</a></code></li>
+<li><code><a title="fileagent.managers.manager_arguments.ManagerArguments.set_arguments" href="managers/manager_arguments.html#fileagent.managers.manager_arguments.ManagerArguments.set_arguments">set_arguments</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="fileagent.managers.manager_files.ManagerFiles" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles">ManagerFiles</a></b></code>:
+<ul class="hlist">
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.file_backup" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.file_backup">file_backup</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.get_parent" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.get_parent">get_parent</a></code></li>
+</ul>
+</li>
+<li><code><b><a title="fileagent.managers.manager_snort.ManagerSnort" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort">ManagerSnort</a></b></code>:
+<ul class="hlist">
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.append_rule" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.append_rule">append_rule</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request">get_ip_from_request</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.ip_matches" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.ip_matches">ip_matches</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_exists" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.rule_exists">rule_exists</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_translator" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.rule_translator">rule_translator</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.to_hex" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.to_hex">to_hex</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -703,15 +260,8 @@ Checks if it is a json or text file and extracts the ip address</p>
 <ul>
 <li>
 <h4><code><a title="fileagent.main.FileAgent" href="#fileagent.main.FileAgent">FileAgent</a></code></h4>
-<ul class="two-column">
-<li><code><a title="fileagent.main.FileAgent.append_rule" href="#fileagent.main.FileAgent.append_rule">append_rule</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.file_backup" href="#fileagent.main.FileAgent.file_backup">file_backup</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.ip_matches" href="#fileagent.main.FileAgent.ip_matches">ip_matches</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.main" href="#fileagent.main.FileAgent.main">main</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.rule_exists" href="#fileagent.main.FileAgent.rule_exists">rule_exists</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.rule_translator" href="#fileagent.main.FileAgent.rule_translator">rule_translator</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.set_arguments" href="#fileagent.main.FileAgent.set_arguments">set_arguments</a></code></li>
-<li><code><a title="fileagent.main.FileAgent.setup_routes" href="#fileagent.main.FileAgent.setup_routes">setup_routes</a></code></li>
+<ul class="">
+<li><code><a title="fileagent.main.FileAgent.default_values" href="#fileagent.main.FileAgent.default_values">default_values</a></code></li>
 </ul>
 </li>
 </ul>
