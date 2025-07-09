@@ -1,8 +1,8 @@
 from pathlib import Path
-from fileagent.manager_api import ManagerAPI
-from fileagent.manager_arguments import ManagerArguments
-from fileagent.manager_files import ManagerFiles
-from fileagent.manager_snort import ManagerSnort
+from fileagent.managers.manager_api import ManagerAPI
+from fileagent.managers.manager_arguments import ManagerArguments
+from fileagent.managers.manager_files import ManagerFiles
+from fileagent.managers.manager_snort import ManagerSnort
 
 
 class FileAgent(ManagerAPI, ManagerArguments, ManagerFiles, ManagerSnort):
@@ -40,7 +40,6 @@ class FileAgent(ManagerAPI, ManagerArguments, ManagerFiles, ManagerSnort):
         Raises:
             ValueError: File name is required
         """
-
         if any(value is None for value in kwargs.values()) or len(kwargs) == 0:
             self.set_arguments()
             self.args = self.parser.parse_args()
