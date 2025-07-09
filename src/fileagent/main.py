@@ -3,18 +3,18 @@ import json
 import re
 import argparse
 import datetime
-from apiclass import APIClass
-from manager_arguments import ManagerArguments
-from manager_files import ManagerFiles
-from manager_snort import ManagerSnort
+from fileagent.manager_api import ManagerAPI
+from fileagent.manager_arguments import ManagerArguments
+from fileagent.manager_files import ManagerFiles
+from fileagent.manager_snort import ManagerSnort
 
 
-class FileAgent(APIClass, ManagerArguments, ManagerFiles, ManagerSnort):
+class FileAgent(ManagerAPI, ManagerArguments, ManagerFiles, ManagerSnort):
     def __init__(self, *args, **kwargs):
         ManagerArguments.__init__(self, *args, **kwargs)
         ManagerFiles.__init__(self, *args, **kwargs)
         # Handle the api
-        APIClass.__init__(self, *args, **kwargs)
+        ManagerAPI.__init__(self, *args, **kwargs)
 
 
 if __name__ == "__main__":
