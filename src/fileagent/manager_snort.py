@@ -59,11 +59,10 @@ class ManagerSnort:
             str: Rule to be appended to the rules file
         """
 
-        if ip := self.get_ip_from_request(data) is None:
+        if (ip := self.get_ip_from_request(data)) is None:
             return
 
         rule = f"""alert ip {ip} any -> $HOME_NET any (msg: "IP Alert Incoming From IP: {ip}";   classtype:tcp-connection; sid:28154103; rev:1; reference:url,https://misp.gsma.com/events/view/19270;)"""
-
         return rule
 
     def append_rule(self, data):
@@ -77,13 +76,12 @@ class ManagerSnort:
 
         # Right now this is just a simple implementation
 
-        if rule := self.rule_translator(data) is None:
+        if (rule := self.rule_translator(data)) is None:
             return
 
         if self.rule_exists(rule):
             return
 
-        print(f"Appending rule: {rule}")
         # Backup the rules file
         self.file_backup()
 
@@ -111,10 +109,3 @@ class ManagerSnort:
             if any(rule in rule_line for rule_line in rules):
                 return True
             return False
-
-
-if __name__ == "__main__":
-
-    agent = ManagerSnort()
-    agent.run_uvicorn()
-#
