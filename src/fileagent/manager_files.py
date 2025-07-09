@@ -1,22 +1,18 @@
 from pathlib import Path
-import json
-import re
-import argparse
 import datetime
+import inspect
 
 
 class ManagerFiles:
     def __init__(self, *args, **kwargs):
 
-        # This should change to correlate with the arguments passed
-        # TODO: This should change to accept from the user
-        self.internal_path = Path(__file__).parent.parent
-        # For non docker usage
-        self.internal_path = Path(self.internal_path.parent, "snort", "volumes")
+        # Initialize some paths that are deemed important
 
-        self.data_path = Path(self.internal_path, "custom")
-        self.data_backup_path = Path(self.data_path, "backup")
-        self.rules_file = Path(self.data_path, self.args.file)
+        self.data_backup_path = Path(self.directory, "backup")
+        if not self.data_backup_path.exists():
+            self.data_backup_path.mkdir(parents=True, exist_ok=True)
+
+        self.rules_file = Path(self.directory, self.args.file)
 
     def file_backup(self):
         """
@@ -47,23 +43,33 @@ class ManagerFiles:
 
         """
 
-        # Copy the self.rules_file to the backup directory with the name filename-time.bak
-        # Ensure the backup directory exists
-        self.data_backup_path.mkdir(parents=True, exist_ok=True)
         print(f"Creating backup in {self.data_backup_path}")
         # Create the backup file path
         backup_file = Path(
             self.data_backup_path,
             f"{self.rules_file.stem}-{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.bak",
         )
+
         with open(self.rules_file, "r") as file:
             rules = file.readlines()
 
-            with open(backup_file, "w") as file:
-                file.writelines(rules)
+        with open(backup_file, "w") as file:
+            file.writelines(rules)
 
+    def get_parent(self):
+        """
+        Description:
+            Retrieves the absolute path of the parent directory of the file
+            that is at the bottom of the current call stack.
+            This method uses the `inspect` module to access the call stack
+            and determines the file path of the last frame in the stack.
+            It then resolves and returns the parent directory of that file.
 
-if __name__ == "__main__":
+        Returns:
+            pathlib.Path: The absolute path of the parent directory of the file
+            at the bottom of the call stack.
+        """
 
-    agent = ManagerFiles()
-    agent.run_uvicorn()
+        file_called_frame = inspect.stack()
+        file_called_path = Path(file_called_frame[-1].filename)
+        return Path(file_called_path).parent.resolve()
