@@ -7,7 +7,7 @@ class AgentTester:
         self.path = Path(__file__).parent
         self.port = 8000
 
-    def send(self, url, file_path, content_type):
+    def send(self, url, file_path):
         # Ensure the file exists before attempting to send
         if not file_path.exists():
             print(f"Error: File not found - {file_path}")
@@ -18,7 +18,7 @@ class AgentTester:
                 "file": (
                     file_path.name,
                     file,
-                    content_type,
+                    "application/json",
                 )  # Use file_path.name as a string
             }
             try:
@@ -32,11 +32,15 @@ class AgentTester:
         url = f"http://127.0.0.1:{self.port}/upload"
 
         # Define file paths
-        file_json = self.path / "sample.json"
-        # file_txt = self.path / "sample.txt"
+        files = [
+            "alert_ip.json",
+            "block_ip.json",
+            "block_domain.json",
+        ]
 
-        # Send requests for both files
-        self.send(url, file_json, "application/json")
+        for file_name in files:
+            # Send requests for both files
+            self.send(url, Path(self.path, file_name))
         # self.send(url, file_txt, "text/plain")
 
 
