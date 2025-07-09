@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 import uvicorn
 
 
-class APIClass:
+class ManagerAPI:
     def __init__(self, *args, **kwargs):
         """
         Initializes the API class with the given parameters.
@@ -98,5 +98,5 @@ class APIClass:
 
 if __name__ == "__main__":
 
-    agent = APIClass()
+    agent = ManagerAPI()
     agent.run_uvicorn()
