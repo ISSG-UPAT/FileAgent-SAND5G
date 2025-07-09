@@ -33,11 +33,11 @@ class AgentTester:
 
         # Define file paths
         file_json = self.path / "sample.json"
-        file_txt = self.path / "sample.txt"
+        # file_txt = self.path / "sample.txt"
 
         # Send requests for both files
         self.send(url, file_json, "application/json")
-        self.send(url, file_txt, "text/plain")
+        # self.send(url, file_txt, "text/plain")
 
 
 if __name__ == "__main__":
