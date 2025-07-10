@@ -63,6 +63,7 @@ class ManagerSnort:
             "block_ip": self.building_rule_block,
             "block_domain": self.building_rule_block_domain,
             "alert_ip": self.building_rule_alert,
+            "block_icmp": self.building_rule_block_icmp,
         }
 
         rule = None
@@ -84,6 +85,46 @@ class ManagerSnort:
             rule += f'msg:"{msg}"; '  # Message of the alert
         else:
             rule += f'msg:"Block traffic From IP {target}"; '
+        rule += ")"
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_block_icmp(
+        self, target: str, msg: str = None, verbose=False
+    ) -> str:
+        rule = ""
+
+        rule += f"block "  # Start of the rule
+        rule += f"icmp "
+        rule += f"{target} "
+        rule += "any -> $HOME_NET any "  # Direction of the alert
+        rule += "("
+
+        if msg:
+            rule += f'msg:"{msg}"; '  # Message of the alert
+        else:
+            rule += f'msg:"Block icmp From IP {target}"; '
+        rule += ")"
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_alert_icmp(
+        self, target: str, msg: str = None, verbose=False
+    ) -> str:
+        rule = ""
+
+        rule += f"alert "  # Start of the rule
+        rule += f"icmp "
+        rule += f"{target} "
+        rule += "any -> $HOME_NET any "  # Direction of the alert
+        rule += "("
+
+        if msg:
+            rule += f'msg:"{msg}"; '  # Message of the alert
+        else:
+            rule += f'msg:"Alert icmp From IP {target}"; '
         rule += ")"
         if verbose:
             print(rule)
@@ -200,3 +241,5 @@ if __name__ == "__main__":
     domain = "training.testserver.gr"
     content = "74 72 61 69 6e 69 6e 67 2e 74 65 73 74 73 65 72 76 65 72 2e 67 72"
     snorty.building_rule_block_domain(domain, verbose=True)
+    snorty.building_rule_block_icmp("10.45.0.3", verbose=True)
+    snorty.building_rule_alert_icmp("10.45.0.3", verbose=True)
