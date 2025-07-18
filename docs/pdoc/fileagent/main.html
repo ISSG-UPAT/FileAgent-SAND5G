@@ -90,16 +90,25 @@ el.replaceWith(d);
         Raises:
             ValueError: File name is required
         &#34;&#34;&#34;
+
+        # This should be changed.
         if any(value is None for value in kwargs.values()) or len(kwargs) == 0:
             self.set_arguments()
             self.args = self.parser.parse_args()
 
-        attributes = {
-            &#34;port&#34;: (kwargs.get(&#34;port&#34;), self.args.port),
-            &#34;host&#34;: (kwargs.get(&#34;host&#34;), self.args.host),
-            &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), self.args.directory),
-            &#34;file&#34;: (kwargs.get(&#34;file&#34;), self.args.file),
-        }
+            attributes = {
+                &#34;port&#34;: (kwargs.get(&#34;port&#34;), self.args.port),
+                &#34;host&#34;: (kwargs.get(&#34;host&#34;), self.args.host),
+                &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), self.args.directory),
+                &#34;file&#34;: (kwargs.get(&#34;file&#34;), self.args.file),
+            }
+        else:
+            attributes = {
+                &#34;port&#34;: (kwargs.get(&#34;port&#34;), 8000),
+                &#34;host&#34;: (kwargs.get(&#34;host&#34;), &#34;0.0.0.0&#34;),
+                &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), None),
+                &#34;file&#34;: (kwargs.get(&#34;file&#34;), None),
+            }
 
         self.assign_attributes(attributes)
 
@@ -166,16 +175,25 @@ el.replaceWith(d);
     Raises:
         ValueError: File name is required
     &#34;&#34;&#34;
+
+    # This should be changed.
     if any(value is None for value in kwargs.values()) or len(kwargs) == 0:
         self.set_arguments()
         self.args = self.parser.parse_args()
 
-    attributes = {
-        &#34;port&#34;: (kwargs.get(&#34;port&#34;), self.args.port),
-        &#34;host&#34;: (kwargs.get(&#34;host&#34;), self.args.host),
-        &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), self.args.directory),
-        &#34;file&#34;: (kwargs.get(&#34;file&#34;), self.args.file),
-    }
+        attributes = {
+            &#34;port&#34;: (kwargs.get(&#34;port&#34;), self.args.port),
+            &#34;host&#34;: (kwargs.get(&#34;host&#34;), self.args.host),
+            &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), self.args.directory),
+            &#34;file&#34;: (kwargs.get(&#34;file&#34;), self.args.file),
+        }
+    else:
+        attributes = {
+            &#34;port&#34;: (kwargs.get(&#34;port&#34;), 8000),
+            &#34;host&#34;: (kwargs.get(&#34;host&#34;), &#34;0.0.0.0&#34;),
+            &#34;directory&#34;: (kwargs.get(&#34;directory&#34;), None),
+            &#34;file&#34;: (kwargs.get(&#34;file&#34;), None),
+        }
 
     self.assign_attributes(attributes)
 
@@ -228,15 +246,28 @@ It also checks if the file is None, and raises a ValueError if it is.</p>
 <li><code><b><a title="fileagent.managers.manager_files.ManagerFiles" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles">ManagerFiles</a></b></code>:
 <ul class="hlist">
 <li><code><a title="fileagent.managers.manager_files.ManagerFiles.file_backup" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.file_backup">file_backup</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.get_history_file" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.get_history_file">get_history_file</a></code></li>
 <li><code><a title="fileagent.managers.manager_files.ManagerFiles.get_parent" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.get_parent">get_parent</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.save_file_content" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.save_file_content">save_file_content</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.save_file_json" href="managers/manager_files.html#fileagent.managers.manager_files.ManagerFiles.save_file_json">save_file_json</a></code></li>
 </ul>
 </li>
 <li><code><b><a title="fileagent.managers.manager_snort.ManagerSnort" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort">ManagerSnort</a></b></code>:
 <ul class="hlist">
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.append_rule" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.append_rule">append_rule</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.builder" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.builder">builder</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert">building_rule_alert</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp">building_rule_alert_icmp</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.building_rule_block">building_rule_block</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain">building_rule_block_domain</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_icmp" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.building_rule_block_icmp">building_rule_block_icmp</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_current_sid" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.get_current_sid">get_current_sid</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request">get_ip_from_request</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_rules_from_file" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.get_rules_from_file">get_rules_from_file</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.ip_matches" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.ip_matches">ip_matches</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.read_snort_rules" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.read_snort_rules">read_snort_rules</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_exists" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.rule_exists">rule_exists</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_splitter" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.rule_splitter">rule_splitter</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_translator" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.rule_translator">rule_translator</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.to_hex" href="managers/manager_snort.html#fileagent.managers.manager_snort.ManagerSnort.to_hex">to_hex</a></code></li>
 </ul>

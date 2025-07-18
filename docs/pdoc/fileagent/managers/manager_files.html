@@ -57,14 +57,22 @@ el.replaceWith(d);
 </summary>
 <pre><code class="python">class ManagerFiles:
     def __init__(self, *args, **kwargs):
+        &#34;&#34;&#34;
+        Description:
+            -----------
 
+            This class manages file operations related to the rules and history files.
+            It initializes paths for the rules file, backup directory, and history file.
+            It also provides a method to create backups of the rules file.
+        &#34;&#34;&#34;
         # Initialize some paths that are deemed important
 
         self.data_backup_path = Path(self.directory, &#34;backup&#34;)
         if not self.data_backup_path.exists():
             self.data_backup_path.mkdir(parents=True, exist_ok=True)
 
-        self.rules_file = Path(self.directory, self.args.file)
+        self.rules_file = Path(self.directory, self.file)
+        self.get_history_file(kwargs.get(&#34;history_file&#34;, None))
 
     def file_backup(self):
         &#34;&#34;&#34;
@@ -124,9 +132,95 @@ el.replaceWith(d);
 
         file_called_frame = inspect.stack()
         file_called_path = Path(file_called_frame[-1].filename)
-        return Path(file_called_path).parent.resolve()</code></pre>
+        return Path(file_called_path).parent.resolve()
+
+    def get_history_file(self, filepath: str = None) -&gt; Path:
+        &#34;&#34;&#34;
+        Description:
+            this function will get path of the file that contains the history of the notifications.
+        Returns:
+            pathlib.Path: The absolute path of the history directory.
+        &#34;&#34;&#34;
+
+        # Doesn&#39;t contain any checks for filename or filepath. For now
+        if filepath:
+            self.history_file = Path(filepath)
+            return self.history_file
+
+        self.history_file = Path(self.directory, &#34;history.json&#34;)
+        if not self.history_file.exists():
+            self.history_file.parent.mkdir(parents=True, exist_ok=True)
+            self.history_file.touch()
+            with open(self.history_file, &#34;w&#34;) as file:
+                json.dump({&#34;history&#34;: []}, file)
+        return self.history_file
+
+    def get_file_content(self, filepath, filetype: str = None):
+
+        with open(filepath, &#34;r&#34;) as file:
+            content = file.read()
+        if filetype == &#34;json&#34;:
+            return json.loads(content)
+        elif filetype == &#34;txt&#34;:
+            return content.splitlines()
+        else:
+            return content
+
+    def save_file_content(self, filepath, content, filetype: str = None):
+        &#34;&#34;&#34;
+        Description:
+            Saves the content of a file to the specified filepath.
+            If the filetype is &#39;json&#39;, it saves the content as a JSON string.
+            If the filetype is &#39;txt&#39;, it saves the content as plain text.
+            If no filetype is specified, it saves the content as a plain text file.
+
+        Args:
+            filepath (str): The path where the file should be saved.
+            filetype (str, optional): The type of the file (&#39;json&#39;, &#39;txt&#39;). Defaults to None.
+
+        Returns:
+            None
+        &#34;&#34;&#34;
+
+        with open(filepath, &#34;w&#34;) as file:
+            if filetype == &#34;json&#34;:
+                json.dump(content, file)
+            elif filetype == &#34;txt&#34;:
+                file.write(&#34;\n&#34;.join(content))
+            else:
+                file.write(content)
+
+    def save_file_json(self, filepath, content):
+        &#34;&#34;&#34;
+        Description:
+            Saves the content of a file to the specified filepath in JSON format.
+            This method reads the content from `self.content`, which should be a dictionary,
+            and writes it to the specified file as a JSON string.
+
+        Args:
+            filepath (str): The path where the file should be saved.
+
+        Returns:
+            None
+        &#34;&#34;&#34;
+
+        original = self.get_file_content(filepath, &#34;json&#34;)
+        original[&#34;history&#34;].append(content)
+
+        self.save_file_content(filepath, original, &#34;json&#34;)
+
+    def save_history(self, content):
+        history = {
+            &#34;timestamp&#34;: datetime.datetime.now().strftime(&#34;%Y-%m-%d %H:%M:%S&#34;),
+            &#34;content&#34;: content,
+        }
+        self.save_file_json(self.history_file, history)</code></pre>
 </details>
-<div class="desc"></div>
+<div class="desc"><h2 id="description">Description</h2>
+<hr>
+<p>This class manages file operations related to the rules and history files.
+It initializes paths for the rules file, backup directory, and history file.
+It also provides a method to create backups of the rules file.</p></div>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="fileagent.main.FileAgent" href="../main.html#fileagent.main.FileAgent">FileAgent</a></li>
@@ -210,6 +304,64 @@ valid <code>Path</code> objects.
 <dd>If there is an issue reading from or writing to the files.</dd>
 </dl></div>
 </dd>
+<dt id="fileagent.managers.manager_files.ManagerFiles.get_file_content"><code class="name flex">
+<span>def <span class="ident">get_file_content</span></span>(<span>self, filepath, filetype: str = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_file_content(self, filepath, filetype: str = None):
+
+    with open(filepath, &#34;r&#34;) as file:
+        content = file.read()
+    if filetype == &#34;json&#34;:
+        return json.loads(content)
+    elif filetype == &#34;txt&#34;:
+        return content.splitlines()
+    else:
+        return content</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fileagent.managers.manager_files.ManagerFiles.get_history_file"><code class="name flex">
+<span>def <span class="ident">get_history_file</span></span>(<span>self, filepath: str = None) ‑> pathlib._local.Path</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_history_file(self, filepath: str = None) -&gt; Path:
+    &#34;&#34;&#34;
+    Description:
+        this function will get path of the file that contains the history of the notifications.
+    Returns:
+        pathlib.Path: The absolute path of the history directory.
+    &#34;&#34;&#34;
+
+    # Doesn&#39;t contain any checks for filename or filepath. For now
+    if filepath:
+        self.history_file = Path(filepath)
+        return self.history_file
+
+    self.history_file = Path(self.directory, &#34;history.json&#34;)
+    if not self.history_file.exists():
+        self.history_file.parent.mkdir(parents=True, exist_ok=True)
+        self.history_file.touch()
+        with open(self.history_file, &#34;w&#34;) as file:
+            json.dump({&#34;history&#34;: []}, file)
+    return self.history_file</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>this function will get path of the file that contains the history of the notifications.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>pathlib.Path</code></dt>
+<dd>The absolute path of the history directory.</dd>
+</dl></div>
+</dd>
 <dt id="fileagent.managers.manager_files.ManagerFiles.get_parent"><code class="name flex">
 <span>def <span class="ident">get_parent</span></span>(<span>self)</span>
 </code></dt>
@@ -249,6 +401,109 @@ It then resolves and returns the parent directory of that file.</p>
 </dl>
 <p>at the bottom of the call stack.</p></div>
 </dd>
+<dt id="fileagent.managers.manager_files.ManagerFiles.save_file_content"><code class="name flex">
+<span>def <span class="ident">save_file_content</span></span>(<span>self, filepath, content, filetype: str = None)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_file_content(self, filepath, content, filetype: str = None):
+    &#34;&#34;&#34;
+    Description:
+        Saves the content of a file to the specified filepath.
+        If the filetype is &#39;json&#39;, it saves the content as a JSON string.
+        If the filetype is &#39;txt&#39;, it saves the content as plain text.
+        If no filetype is specified, it saves the content as a plain text file.
+
+    Args:
+        filepath (str): The path where the file should be saved.
+        filetype (str, optional): The type of the file (&#39;json&#39;, &#39;txt&#39;). Defaults to None.
+
+    Returns:
+        None
+    &#34;&#34;&#34;
+
+    with open(filepath, &#34;w&#34;) as file:
+        if filetype == &#34;json&#34;:
+            json.dump(content, file)
+        elif filetype == &#34;txt&#34;:
+            file.write(&#34;\n&#34;.join(content))
+        else:
+            file.write(content)</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Saves the content of a file to the specified filepath.
+If the filetype is 'json', it saves the content as a JSON string.
+If the filetype is 'txt', it saves the content as plain text.
+If no filetype is specified, it saves the content as a plain text file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filepath</code></strong> :&ensp;<code>str</code></dt>
+<dd>The path where the file should be saved.</dd>
+<dt><strong><code>filetype</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The type of the file ('json', 'txt'). Defaults to None.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p></div>
+</dd>
+<dt id="fileagent.managers.manager_files.ManagerFiles.save_file_json"><code class="name flex">
+<span>def <span class="ident">save_file_json</span></span>(<span>self, filepath, content)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_file_json(self, filepath, content):
+    &#34;&#34;&#34;
+    Description:
+        Saves the content of a file to the specified filepath in JSON format.
+        This method reads the content from `self.content`, which should be a dictionary,
+        and writes it to the specified file as a JSON string.
+
+    Args:
+        filepath (str): The path where the file should be saved.
+
+    Returns:
+        None
+    &#34;&#34;&#34;
+
+    original = self.get_file_content(filepath, &#34;json&#34;)
+    original[&#34;history&#34;].append(content)
+
+    self.save_file_content(filepath, original, &#34;json&#34;)</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Saves the content of a file to the specified filepath in JSON format.
+This method reads the content from <code>self.content</code>, which should be a dictionary,
+and writes it to the specified file as a JSON string.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>filepath</code></strong> :&ensp;<code>str</code></dt>
+<dd>The path where the file should be saved.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>None</p></div>
+</dd>
+<dt id="fileagent.managers.manager_files.ManagerFiles.save_history"><code class="name flex">
+<span>def <span class="ident">save_history</span></span>(<span>self, content)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_history(self, content):
+    history = {
+        &#34;timestamp&#34;: datetime.datetime.now().strftime(&#34;%Y-%m-%d %H:%M:%S&#34;),
+        &#34;content&#34;: content,
+    }
+    self.save_file_json(self.history_file, history)</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -268,9 +523,14 @@ It then resolves and returns the parent directory of that file.</p>
 <ul>
 <li>
 <h4><code><a title="fileagent.managers.manager_files.ManagerFiles" href="#fileagent.managers.manager_files.ManagerFiles">ManagerFiles</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="fileagent.managers.manager_files.ManagerFiles.file_backup" href="#fileagent.managers.manager_files.ManagerFiles.file_backup">file_backup</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.get_file_content" href="#fileagent.managers.manager_files.ManagerFiles.get_file_content">get_file_content</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.get_history_file" href="#fileagent.managers.manager_files.ManagerFiles.get_history_file">get_history_file</a></code></li>
 <li><code><a title="fileagent.managers.manager_files.ManagerFiles.get_parent" href="#fileagent.managers.manager_files.ManagerFiles.get_parent">get_parent</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.save_file_content" href="#fileagent.managers.manager_files.ManagerFiles.save_file_content">save_file_content</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.save_file_json" href="#fileagent.managers.manager_files.ManagerFiles.save_file_json">save_file_json</a></code></li>
+<li><code><a title="fileagent.managers.manager_files.ManagerFiles.save_history" href="#fileagent.managers.manager_files.ManagerFiles.save_history">save_history</a></code></li>
 </ul>
 </li>
 </ul>
