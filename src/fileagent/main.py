@@ -40,16 +40,25 @@ class FileAgent(ManagerAPI, ManagerArguments, ManagerFiles, ManagerSnort):
         Raises:
             ValueError: File name is required
         """
+
+        # This should be changed.
         if any(value is None for value in kwargs.values()) or len(kwargs) == 0:
             self.set_arguments()
             self.args = self.parser.parse_args()
 
-        attributes = {
-            "port": (kwargs.get("port"), self.args.port),
-            "host": (kwargs.get("host"), self.args.host),
-            "directory": (kwargs.get("directory"), self.args.directory),
-            "file": (kwargs.get("file"), self.args.file),
-        }
+            attributes = {
+                "port": (kwargs.get("port"), self.args.port),
+                "host": (kwargs.get("host"), self.args.host),
+                "directory": (kwargs.get("directory"), self.args.directory),
+                "file": (kwargs.get("file"), self.args.file),
+            }
+        else:
+            attributes = {
+                "port": (kwargs.get("port"), 8000),
+                "host": (kwargs.get("host"), "0.0.0.0"),
+                "directory": (kwargs.get("directory"), None),
+                "file": (kwargs.get("file"), None),
+            }
 
         self.assign_attributes(attributes)
 

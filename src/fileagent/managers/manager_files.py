@@ -20,7 +20,7 @@ class ManagerFiles:
         if not self.data_backup_path.exists():
             self.data_backup_path.mkdir(parents=True, exist_ok=True)
 
-        self.rules_file = Path(self.directory, self.args.file)
+        self.rules_file = Path(self.directory, self.file)
         self.get_history_file(kwargs.get("history_file", None))
 
     def file_backup(self):
@@ -101,7 +101,7 @@ class ManagerFiles:
             self.history_file.parent.mkdir(parents=True, exist_ok=True)
             self.history_file.touch()
             with open(self.history_file, "w") as file:
-                json.dump({}, file)
+                json.dump({"history": []}, file)
         return self.history_file
 
     def get_file_content(self, filepath, filetype: str = None):
@@ -133,7 +133,6 @@ class ManagerFiles:
 
         with open(filepath, "w") as file:
             if filetype == "json":
-
                 json.dump(content, file)
             elif filetype == "txt":
                 file.write("\n".join(content))
@@ -155,9 +154,8 @@ class ManagerFiles:
         """
 
         original = self.get_file_content(filepath, "json")
-        if not original:
-            original = {}
-        original.update(content)
+        original["history"].append(content)
+
         self.save_file_content(filepath, original, "json")
 
     def save_history(self, content):
