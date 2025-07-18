@@ -5,7 +5,14 @@ import inspect
 
 class ManagerFiles:
     def __init__(self, *args, **kwargs):
+        """
+        Description:
+            -----------
 
+            This class manages file operations related to the rules and history files.
+            It initializes paths for the rules file, backup directory, and history file.
+            It also provides a method to create backups of the rules file.
+        """
         # Initialize some paths that are deemed important
 
         self.data_backup_path = Path(self.directory, "backup")
@@ -13,6 +20,7 @@ class ManagerFiles:
             self.data_backup_path.mkdir(parents=True, exist_ok=True)
 
         self.rules_file = Path(self.directory, self.args.file)
+        self.get_history_file(kwargs.get("history_file", None))
 
     def file_backup(self):
         """
@@ -73,3 +81,35 @@ class ManagerFiles:
         file_called_frame = inspect.stack()
         file_called_path = Path(file_called_frame[-1].filename)
         return Path(file_called_path).parent.resolve()
+
+    def get_history_file(self, filepath: str = None) -> Path:
+        """
+        Description:
+            this function will get path of the file that contains the history of the notifications.
+        Returns:
+            pathlib.Path: The absolute path of the history directory.
+        """
+
+        # Doesn't contain any checks for filename or filepath. For now
+        if filepath:
+            self.history_file = Path(filepath)
+            return self.history_file
+
+        self.history_file = Path(self.directory, "history.json")
+        if not self.history_file.exists():
+            self.history_file.parent.mkdir(parents=True, exist_ok=True)
+            self.history_file.touch()
+        return self.history_file
+
+    def get_file_content(self, filepath, filetype: str = None):
+
+        with open(filepath, "r") as file:
+            content = file.read()
+        if filetype == "json":
+            import json
+
+            return json.loads(content)
+        elif filetype == "txt":
+            return content.splitlines()
+        else:
+            return content

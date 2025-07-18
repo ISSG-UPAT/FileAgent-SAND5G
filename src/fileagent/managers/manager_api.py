@@ -52,6 +52,28 @@ class ManagerAPI:
 
             return await self.upload_functionality(file)
 
+        @self.app.get("/dashboard")
+        async def dashboard():
+            """
+            Description:
+                Endpoint to retrieve the dashboard data.
+                This is a placeholder function that can be expanded to return
+                actual dashboard data in the future.
+
+            Returns:
+                dict: A simple message indicating the dashboard is ready.
+            """
+            # function from manager_files.py
+
+            notifications = self.get_file_content(self.history_file, "json")
+            if notifications is None:
+                raise HTTPException(status_code=404, detail="No notifications found")
+
+            return {
+                "message": "Dashboard is ready",
+                "notifications": notifications,
+            }
+
     async def upload_functionality(self, file: UploadFile):
         """
         Description:
