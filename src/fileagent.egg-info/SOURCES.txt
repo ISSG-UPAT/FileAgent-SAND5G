@@ -6,10 +6,6 @@ src/fileagent/__init__.py
 src/fileagent/__main__.py
 src/fileagent/all_included.py
 src/fileagent/main.py
-src/fileagent/manager_api.py
-src/fileagent/manager_arguments.py
-src/fileagent/manager_files.py
-src/fileagent/manager_snort.py
 src/fileagent.egg-info/PKG-INFO
 src/fileagent.egg-info/SOURCES.txt
 src/fileagent.egg-info/dependency_links.txt
