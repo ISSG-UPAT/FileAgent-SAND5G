@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 <meta name="generator" content="pdoc3 0.11.6">
-<title>fileagent API documentation</title>
+<title>fileagent.managers.manager_arguments API documentation</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
@@ -33,32 +33,171 @@ el.replaceWith(d);
 <main>
 <article id="content">
 <header>
-<h1 class="title">Package <code>fileagent</code></h1>
+<h1 class="title">Module <code>fileagent.managers.manager_arguments</code></h1>
 </header>
 <section id="section-intro">
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="fileagent.all_included" href="all_included.html">fileagent.all_included</a></code></dt>
+<dt id="fileagent.managers.manager_arguments.ManagerArguments"><code class="flex name class">
+<span>class <span class="ident">ManagerArguments</span></span>
+</code></dt>
 <dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ManagerArguments:
+    def set_arguments(self):
+        &#34;&#34;&#34;
+        Description:
+            Set the arguments for the agent, and save the important information as attributes of the class
+        &#34;&#34;&#34;
+
+        self.parser = argparse.ArgumentParser()
+        self.parser.add_argument(
+            &#34;-p&#34;,
+            &#34;--port&#34;,
+            type=int,
+            default=8000,
+            help=&#34;Port to run the fastapi server on&#34;,
+        )
+
+        self.parser.add_argument(
+            &#34;--host&#34;,
+            type=str,
+            default=&#34;0.0.0.0&#34;,
+            help=&#34;Host of the fastapi server&#34;,
+        )
+
+        self.parser.add_argument(
+            &#34;-f&#34;,
+            &#34;--file&#34;,
+            type=str,
+            default=None,
+            help=&#34;Path to the file&#34;,
+        )
+
+        self.parser.add_argument(
+            &#34;-d&#34;,
+            &#34;--directory&#34;,
+            type=str,
+            default=None,
+            help=&#34;Path to the data directory&#34;,
+        )
+
+    def assign_attributes(self, attributes):
+        &#34;&#34;&#34;
+        Assign attributes dynamically based on provided arguments or defaults.
+
+        Args:
+            attributes (dict): A dictionary where keys are attribute names and values are tuples
+                            of (provided_value, default_value).
+        &#34;&#34;&#34;
+        for attr, (provided_value, default_value) in attributes.items():
+            setattr(
+                self,
+                attr,
+                provided_value if provided_value is not None else default_value,
+            )</code></pre>
+</details>
 <div class="desc"></div>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="fileagent.main.FileAgent" href="../main.html#fileagent.main.FileAgent">FileAgent</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="fileagent.managers.manager_arguments.ManagerArguments.assign_attributes"><code class="name flex">
+<span>def <span class="ident">assign_attributes</span></span>(<span>self, attributes)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def assign_attributes(self, attributes):
+    &#34;&#34;&#34;
+    Assign attributes dynamically based on provided arguments or defaults.
+
+    Args:
+        attributes (dict): A dictionary where keys are attribute names and values are tuples
+                        of (provided_value, default_value).
+    &#34;&#34;&#34;
+    for attr, (provided_value, default_value) in attributes.items():
+        setattr(
+            self,
+            attr,
+            provided_value if provided_value is not None else default_value,
+        )</code></pre>
+</details>
+<div class="desc"><p>Assign attributes dynamically based on provided arguments or defaults.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>attributes</code></strong> :&ensp;<code>dict</code></dt>
+<dd>A dictionary where keys are attribute names and values are tuples
+of (provided_value, default_value).</dd>
+</dl></div>
 </dd>
-<dt><code class="name"><a title="fileagent.main" href="main.html">fileagent.main</a></code></dt>
+<dt id="fileagent.managers.manager_arguments.ManagerArguments.set_arguments"><code class="name flex">
+<span>def <span class="ident">set_arguments</span></span>(<span>self)</span>
+</code></dt>
 <dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="fileagent.managers" href="managers/index.html">fileagent.managers</a></code></dt>
-<dd>
-<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_arguments(self):
+    &#34;&#34;&#34;
+    Description:
+        Set the arguments for the agent, and save the important information as attributes of the class
+    &#34;&#34;&#34;
+
+    self.parser = argparse.ArgumentParser()
+    self.parser.add_argument(
+        &#34;-p&#34;,
+        &#34;--port&#34;,
+        type=int,
+        default=8000,
+        help=&#34;Port to run the fastapi server on&#34;,
+    )
+
+    self.parser.add_argument(
+        &#34;--host&#34;,
+        type=str,
+        default=&#34;0.0.0.0&#34;,
+        help=&#34;Host of the fastapi server&#34;,
+    )
+
+    self.parser.add_argument(
+        &#34;-f&#34;,
+        &#34;--file&#34;,
+        type=str,
+        default=None,
+        help=&#34;Path to the file&#34;,
+    )
+
+    self.parser.add_argument(
+        &#34;-d&#34;,
+        &#34;--directory&#34;,
+        type=str,
+        default=None,
+        help=&#34;Path to the data directory&#34;,
+    )</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Set the arguments for the agent, and save the important information as attributes of the class</p></div>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -66,11 +205,20 @@ el.replaceWith(d);
 <ul></ul>
 </div>
 <ul id="index">
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3>Super-module</h3>
 <ul>
-<li><code><a title="fileagent.all_included" href="all_included.html">fileagent.all_included</a></code></li>
-<li><code><a title="fileagent.main" href="main.html">fileagent.main</a></code></li>
-<li><code><a title="fileagent.managers" href="managers/index.html">fileagent.managers</a></code></li>
+<li><code><a title="fileagent.managers" href="index.html">fileagent.managers</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="fileagent.managers.manager_arguments.ManagerArguments" href="#fileagent.managers.manager_arguments.ManagerArguments">ManagerArguments</a></code></h4>
+<ul class="">
+<li><code><a title="fileagent.managers.manager_arguments.ManagerArguments.assign_attributes" href="#fileagent.managers.manager_arguments.ManagerArguments.assign_attributes">assign_attributes</a></code></li>
+<li><code><a title="fileagent.managers.manager_arguments.ManagerArguments.set_arguments" href="#fileagent.managers.manager_arguments.ManagerArguments.set_arguments">set_arguments</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

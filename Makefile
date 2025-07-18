@@ -143,6 +143,12 @@ doc-pdoc: $(PDOC_DIR)
 	@source $(VENV_DIR)/bin/activate && make -C $(PDOC_DIR) create
 	@echo "Documentation created using pdoc."
 
+doc-pdoc-clean: $(PDOC_DIR)
+	@echo "Deleteing documentation"
+	make -C $(PDOC_DIR) clean
+	@echo "Documentation deleted"
+
+
 # Function to host the documentation html created by pdoc, using pdoc
 # Leverages the makefile inside docs/
 doc-pdoc-host:
@@ -173,6 +179,7 @@ help:
 	@echo "  upload-test          Upload to Test PyPI using twine."
 	@echo "  test                 Run tests using pytest."
 	@echo "  doc-pdoc             Generate documentation using pdoc."
+	@echo "  doc-pdoc-clean       Clean the generated documentation."
 	@echo "  doc-pdoc-host        Host documentation using pdoc."
 	@echo "  help                 Show this help message."
 	@echo ""

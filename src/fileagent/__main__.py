@@ -6,7 +6,7 @@ def main():
     Main function to run the FileAgent.
     """
     agent = FileAgent()
-    agent.main()
+    agent.run_uvicorn()
 
 
 if __name__ == "__main__":

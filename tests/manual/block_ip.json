@@ -1,0 +1,5 @@
+{
+  "file": "sample",
+  "command": "block_ip",
+  "target": "10.1.39.20"
+}

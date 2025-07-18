@@ -1,0 +1,1828 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>fileagent.managers.manager_snort API documentation</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>fileagent.managers.manager_snort</code></h1>
+</header>
+<section id="section-intro">
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="fileagent.managers.manager_snort.ManagerSnort"><code class="flex name class">
+<span>class <span class="ident">ManagerSnort</span></span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ManagerSnort:
+
+    def ip_matches(self, data: str) -&gt; str:
+        &#34;&#34;&#34;
+        Description:
+            Check if the data contains an ip address. Checks for ipv4, ipv6 and url
+
+        Args:
+            data (str): Data to be checked for ip address
+
+        Returns:
+            str: the ip/url regex matching case
+        &#34;&#34;&#34;
+        ipv4_pattern = r&#34;\b(?:\d{1,3}\.){3}\d{1,3}\b&#34;
+        ipv6_pattern = r&#34;\b(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}\b&#34;
+        url_pattern = r&#34;\bhttps?://[^\s/$.?#].[^\s]*\b&#34;
+
+        for pattern in [ipv4_pattern, ipv6_pattern, url_pattern]:
+            match = re.search(pattern, data)
+            if match:
+                return match.group(0)
+        return None
+
+    def get_ip_from_request(self, request: dict) -&gt; str:
+        &#34;&#34;&#34;
+        Description:
+            Get the ip address from the request
+
+        Args:
+            request (dict): Request data to be checked for ip address
+
+        Returns:
+            str: The ip address from the request
+        &#34;&#34;&#34;
+
+        if request.get(&#34;content_type&#34;) == &#34;application/json&#34;:
+            data = json.loads(request.get(&#34;content&#34;))
+            return data.get(&#34;ip&#34;)
+        elif request.get(&#34;content_type&#34;) == &#34;text/plain&#34;:
+            return self.ip_matches(request.get(&#34;content&#34;))
+        else:
+            return None
+
+    def rule_translator(self, data: dict) -&gt; str:
+        &#34;&#34;&#34;
+        Description:
+            Translate the data into a rule
+            Right now this is a simple implementation
+            Checks if it is a json or text file and extracts the ip address
+
+        Args:
+            data (dict): Data from the post request to be translated into a rule,
+
+        Returns:
+            str: Rule to be appended to the rules file
+        &#34;&#34;&#34;
+
+        tranlator_book = {
+            &#34;block_ip&#34;: self.building_rule_block,
+            &#34;block_domain&#34;: self.building_rule_block_domain,
+            &#34;alert_ip&#34;: self.building_rule_alert,
+            &#34;block_icmp&#34;: self.building_rule_block_icmp,
+        }
+
+        rule = None
+
+        if (command := data.get(&#34;command&#34;)) in tranlator_book.keys():
+            rule = tranlator_book[command](data.get(&#34;target&#34;))
+        return rule
+
+    def building_rule_block(self, target: str, msg: str = None, verbose=False) -&gt; str:
+        &#34;&#34;&#34;
+        Builds a Snort rule to block HTTP traffic from a specific target.
+
+        Args:
+            target (str): The target IP address or domain.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        &#34;&#34;&#34;
+        parts, opts = self.builder(
+            action=&#34;block&#34;,
+            protocol=&#34;http&#34;,
+            src_ip=target,
+            src_port=&#34;any&#34;,
+            direction=&#34;-&gt;&#34;,
+            dst_ip=&#34;$HOME_NET&#34;,
+            dst_port=&#34;any&#34;,
+            sid=self.get_current_sid(),
+            msg=msg or f&#34;Block traffic From IP {target}&#34;,
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_block_icmp(
+        self, target: str, msg: str = None, verbose=False
+    ) -&gt; str:
+        &#34;&#34;&#34;
+        Builds a Snort rule to block ICMP traffic from a specific target.
+
+        Args:
+            target (str): The target IP address.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        &#34;&#34;&#34;
+        parts, opts = self.builder(
+            action=&#34;block&#34;,
+            protocol=&#34;icmp&#34;,
+            src_ip=target,
+            src_port=&#34;any&#34;,
+            direction=&#34;-&gt;&#34;,
+            dst_ip=&#34;$HOME_NET&#34;,
+            dst_port=&#34;any&#34;,
+            sid=self.get_current_sid(),
+            msg=msg or f&#34;Block ICMP From IP {target}&#34;,
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_alert_icmp(
+        self, target: str, msg: str = None, verbose=False
+    ) -&gt; str:
+        &#34;&#34;&#34;
+        Builds a Snort rule to alert on ICMP traffic from a specific target.
+
+        Args:
+            target (str): The target IP address.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        &#34;&#34;&#34;
+        parts, opts = self.builder(
+            action=&#34;alert&#34;,
+            protocol=&#34;icmp&#34;,
+            src_ip=target,
+            src_port=&#34;any&#34;,
+            direction=&#34;-&gt;&#34;,
+            dst_ip=&#34;$HOME_NET&#34;,
+            dst_port=&#34;any&#34;,
+            sid=self.get_current_sid(),
+            msg=msg or f&#34;Alert ICMP From IP {target}&#34;,
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_block_domain(
+        self, domain: str, msg: str = None, verbose=False
+    ) -&gt; str:
+        &#34;&#34;&#34;
+        Builds a Snort rule to block traffic to a specific domain.
+
+        Args:
+            domain (str): The target domain to block.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        &#34;&#34;&#34;
+
+        parts, opts = self.builder(
+            action=&#34;block&#34;,
+            protocol=&#34;ssl&#34;,
+            src_ip=&#34;any&#34;,
+            src_port=&#34;any&#34;,
+            direction=&#34;-&gt;&#34;,
+            dst_ip=&#34;$HOME_NET&#34;,
+            dst_port=443,
+            sid=self.get_current_sid(),
+            msg=msg or f&#34;Block domain {domain}&#34;,
+            content=[{&#34;value&#34;: self.to_hex(domain)}],
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_alert(self, target: str, msg: str = None, verbose=False) -&gt; str:
+        &#34;&#34;&#34;
+        Builds a Snort rule to alert on IP traffic from a specific target.
+
+        Args:
+            target (str): The target IP address.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        &#34;&#34;&#34;
+        parts, opts = self.builder(
+            action=&#34;alert&#34;,
+            protocol=&#34;ip&#34;,
+            src_ip=target,
+            src_port=&#34;any&#34;,
+            direction=&#34;-&gt;&#34;,
+            dst_ip=&#34;$HOME_NET&#34;,
+            dst_port=&#34;any&#34;,
+            msg=msg or f&#34;IP Alert Incoming From IP {target}&#34;,
+            classtype=&#34;tcp-connection&#34;,
+            sid=28154103,
+            rev=1,
+            reference=[(&#34;url&#34;, &#34;https://misp.gsma.com/events/view/19270&#34;)],
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+        if verbose:
+            print(rule)
+
+        return rule
+
+    def builder(
+        self,
+        action: str = None,
+        rule_type: str = None,
+        protocol: str = None,
+        src_ip: str = None,
+        src_port: int = None,
+        direction: str = None,
+        dst_ip: str = None,
+        dst_port: int = None,
+        msg: str = None,
+        reference: list[tuple[str, str]] = None,
+        gid: int = None,
+        sid: int = None,
+        rev: int = None,
+        classtype: str = None,
+        priority: int = None,
+        metadata: dict[str, str] = None,
+        service_opt: list[str] = None,
+        rem: str = None,
+        file_meta: dict[str, str] = None,
+        content: list[dict[str, str]] = None,
+        pcre: list[str] = None,
+        regex: list[str] = None,
+        bufferlen: int = None,
+        isdataat: bool = None,
+        dsize: int = None,
+        flow: list[str] = None,
+        ttl: int = None,
+        ipopts: list[str] = None,
+        fragoffset: int = None,
+        fragbits: str = None,
+        priority_bit: str = None,
+        dce: str = None,
+        ssl_state: str = None,
+        verbose: bool = False,
+    ) -&gt; list[list[str]]:
+        &#34;&#34;&#34;
+        Description:
+            Builds a Snort rule string based on the provided parameters.
+
+            This function constructs a Snort rule by combining header fields, general options,
+            payload options, and non-payload options. It validates required fields and formats
+            the rule according to Snort syntax.
+
+        Args:
+            action (str): The action to take (e.g., &#39;alert&#39;, &#39;drop&#39;, &#39;log&#39;, etc.).
+            rule_type (str): The type of rule (&#39;traditional&#39;, &#39;service&#39;, &#39;file&#39;, &#39;file_id&#39;).
+            protocol (str): The protocol to match (&#39;ip&#39;, &#39;icmp&#39;, &#39;tcp&#39;, &#39;udp&#39;).
+            src_ip (str): The source IP address.
+            src_port (int): The source port number.
+            direction (str): The direction of traffic (&#39;-&gt;&#39;, &#39;&lt;&gt;&#39;).
+            dst_ip (str): The destination IP address.
+            dst_port (int): The destination port number.
+            msg (str): The message string for the rule.
+            reference (list[tuple[str, str]]): List of references as tuples (scheme, id).
+            gid (int): Group ID for the rule.
+            sid (int): Snort ID for the rule.
+            rev (int): Revision number for the rule.
+            classtype (str): Classification type for the rule.
+            priority (int): Priority level for the rule.
+            metadata (dict[str, str]): Metadata key-value pairs.
+            service_opt (list[str]): List of service options.
+            rem (str): Remarks for the rule.
+            file_meta (dict[str, str]): File metadata with keys like type, id, category, etc.
+            content (list[dict[str, str]]): Payload content options.
+            pcre (list[str]): List of PCRE strings.
+            regex (list[str]): List of regex strings.
+            bufferlen (int): Buffer length for payload matching.
+            isdataat (bool): Indicates if data is at a specific location.
+            dsize (int): Data size for payload matching.
+            flow (list[str]): List of flow options.
+            ttl (int): Time-to-live value.
+            ipopts (list[str]): List of IP options.
+            fragoffset (int): Fragment offset value.
+            fragbits (str): Fragment bits value.
+            priority_bit (str): Priority bit value.
+            dce (str): DCE/RPC options.
+            ssl_state (str): SSL state options.
+            pretty (bool): If True, formats the rule for readability.
+            verbose (bool): If True, prints the rule to the console.
+
+        Returns:
+            list[list[str]]: A list containing the parts and options of the snort rule.
+        &#34;&#34;&#34;
+
+        # build header
+        parts = []
+        if action in (
+            &#34;alert&#34;,
+            &#34;drop&#34;,
+            &#34;log&#34;,
+            &#34;pass&#34;,
+            &#34;block&#34;,
+            &#34;react&#34;,
+            &#34;reject&#34;,
+            &#34;rewrite&#34;,
+        ):
+            parts.append(action)
+
+        # service/file/file_id rules only need action and keyword
+        if rule_type in (&#34;service&#34;, &#34;file&#34;, &#34;file_id&#34;):
+            parts.append(rule_type)
+        else:
+            # Else it is considered traditional
+            for x in (protocol, src_ip, src_port):
+                if not x:
+                    raise ValueError(&#34;protocol, src_ip, src_port required&#34;)
+                parts.append(x)
+
+            # if direction in (&#34;-&gt;&#34;, &#34;&lt;&gt;&#34;, None):
+            #     parts.append(direction or &#34;-&gt;&#34;)
+
+            parts.append(direction or &#34;-&gt;&#34;)
+            for x in (dst_ip, dst_port):
+                if not x:
+                    raise ValueError(&#34;dst_ip,dst_port required&#34;)
+                parts.append(x)
+
+        # build options
+        opts = []
+
+        def opt(name, val):
+            &#34;&#34;&#34;
+            Description:
+                Helper function to append options to the opts list.
+                If val is a list, it appends each value with the name.
+                If val is not None, it appends the name and value.
+
+            Args:
+                name (str): The name of the option.
+                val (any): The value of the option, can be a list or a single value.
+            &#34;&#34;&#34;
+            if isinstance(val, list):
+                for v in val:
+                    opts.append(f&#34;{name}:{v};&#34;)
+            elif val is not None:
+                opts.append(f&#34;{name}:{val};&#34;)
+
+        # general opts
+        if msg:
+            opts.append(f&#34;msg:&#39;{msg}&#39;;&#34;)
+        if reference:
+            # reference is a list of tuples (scheme, id)
+            # e.g. [(&#39;url&#39;, &#39;example.com&#39;), (&#39;cve&#39;, &#39;CVE-2023-1234&#39;)]
+            if not isinstance(reference, list):
+                raise ValueError(&#34;reference must be a list of tuples&#34;)
+            for scheme, rid in reference:
+                opts.append(f&#34;reference:{scheme},{rid};&#34;)
+
+        opt(&#34;gid&#34;, gid)
+        opt(&#34;sid&#34;, sid)
+        opt(&#34;rev&#34;, rev)
+
+        if classtype:
+            opts.append(f&#34;classtype:{classtype};&#34;)
+
+        opt(&#34;priority&#34;, priority)
+
+        if metadata:
+            pairs = [f&#34;{k} {v}&#34; for k, v in metadata.items()]
+            opts.append(f&#34;metadata:{&#39;,&#39;.join(pairs)};&#34;)
+
+        if service_opt:
+            opts.append(f&#34;service:{&#39;,&#39;.join(service_opt)};&#34;)
+
+        if rem:
+            opts.append(f&#34;rem:&#39;{rem}&#39;;&#34;)
+
+        if file_meta:
+            fm = file_meta
+            parts = [f&#34;type {fm[&#39;type&#39;]}&#34;, f&#34;id {fm[&#39;id&#39;]}&#34;]
+            for k in (&#34;category&#34;, &#34;group&#34;, &#34;version&#34;):
+                if fm.get(k):
+                    parts.append(f&#34;{k} &#39;{fm[k]}&#39;&#34;)
+            opts.append(f&#34;file_meta:{&#39;,&#39;.join(parts)};&#34;)
+
+        # payload opts example
+        if content:
+            for c in content:
+                segs = [f&#34;content:&#39;{c[&#39;value&#39;]}&#39;&#34;]
+                for m in (
+                    &#34;fast_pattern&#34;,
+                    &#34;nocase&#34;,
+                    &#34;offset&#34;,
+                    &#34;depth&#34;,
+                    &#34;distance&#34;,
+                    &#34;within&#34;,
+                    &#34;width&#34;,
+                    &#34;endian&#34;,
+                ):
+                    v = c.get(m)
+                    if isinstance(v, bool) and v:
+                        segs.append(m)
+                    elif v not in (None, False):
+                        segs.append(f&#34;{m} {v}&#34;)
+                opts.append(f&#34;{&#39;,&#39;.join(segs)};&#34;)
+
+        # pcre, regex examples
+        if pcre:
+            for r in pcre:
+                opts.append(f&#34;pcre:&#39;{r}&#39;;&#34;)
+
+        if regex:
+            for r in regex:
+                opts.append(f&#34;regex:&#39;{r}&#39;;&#34;)
+
+        # non-payload example
+        if flow:
+            opts.append(f&#34;flow:{&#39;,&#39;.join(flow)};&#34;)
+
+        if verbose:
+            print(&#34;Nothing to verbose. For now &#34;)
+        return parts, opts
+
+    def build_formatter(
+        self, parts: list[str], opts: list[str], pretty: bool = False
+    ) -&gt; str:
+        print(parts)
+        header = &#34; &#34;.join(
+            list(map(lambda x: x if isinstance(x, str) else str(x), parts))
+        )
+
+        # compile rule
+        if pretty:
+            body = &#34;\n    &#34;.join(opts)
+            return f&#34;{header} (\n    {body}\n)&#34;
+        else:
+            body = &#34; &#34;.join(opts)
+            return f&#34;{header} ({body})&#34;
+
+    def to_hex(self, domain: str) -&gt; str:
+        &#34;&#34;&#34;
+        Description:
+            Convert a domain to hex format for snort rules
+
+        Args:
+            domain (str): Domain to be converted
+
+        Returns:
+            str: Hex representation of the domain
+        &#34;&#34;&#34;
+        return &#34; &#34;.join(f&#34;{ord(c):02x}&#34; for c in domain)
+
+    def append_rule(self, data: dict):
+        &#34;&#34;&#34;
+        Description:
+        Append rule to the local.rules
+
+        Args:
+            data (str): Data to be appended to the local.rules file
+        &#34;&#34;&#34;
+
+        # Right now this is just a simple implementation
+
+        if (rule := self.rule_translator(data)) is None:
+            return
+
+        if self.rule_exists(rule):
+            return
+
+        # Backup the rules file
+        self.file_backup()
+
+        # Append the rule to the rules file
+        with open(self.rules_file, &#34;a&#34;) as file:
+            file.write(f&#34;\n{rule}\n&#34;)
+
+    def rule_exists(self, rule):
+        &#34;&#34;&#34;
+        Description:
+            Check if the rule already exists in the rules file
+            This function reads the rules file line by line and determines if the
+            provided rule is present in any of the lines. It is useful for avoiding
+            duplicate entries in the rules file.
+
+        Args:
+            rule (str): Rule to be checked
+
+        Returns:
+            bool: True if the rule exists, False otherwise
+        &#34;&#34;&#34;
+
+        # This needs to change if we are going to go with the pretty building of the rule
+
+        with open(self.rules_file, &#34;r&#34;) as file:
+            rules = self.read_snort_rules(rules=file.readlines())
+            # For now this function can&#39;t accurately check if a snort rule is duplicate,
+            # because of the different sids
+
+            # rules = list(map(self.rule_splitter, rules))
+            # rule_obj = self.rule_splitter(rule)
+            if any(rule in rule_line for rule_line in rules):
+                return True
+            return False
+
+    def get_rules_from_file(self) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Description:
+            Get the rules from the rules file
+            This function reads the rules file and returns a list of rules.
+            It removes comments and empty lines from the rules.
+
+        Returns:
+            list[str]: List of rules from the rules file
+        &#34;&#34;&#34;
+        with open(self.rules_file, &#34;r&#34;) as file:
+            return self.read_snort_rules(rules=file.readlines())
+
+    def read_snort_rules(self, rules: list[str]) -&gt; list[str]:
+        &#34;&#34;&#34;
+        Processes a list of Snort rules and returns a list of valid rules.
+
+        This method filters out comments, handles multi-line rules, and ensures
+        that only properly formatted rules are included in the result.
+
+        Args:
+            rules (list[str]): A list of strings representing Snort rules.
+
+        Returns:
+            list[str]: A list of processed Snort rules. Single-line rules are
+            included directly, while multi-line rules are concatenated into
+            single strings.
+        &#34;&#34;&#34;
+
+        # rules =
+        result = []
+        temp = []
+        multi_line = False
+        for rule in rules:
+            # Remove comments and strip whitespace
+            rule = rule.strip()
+            if rule.startswith(&#34;#&#34;):
+                continue
+
+            # This will only get the rules that are one lined
+            if rule and rule.endswith(&#34;)&#34;) and rule != &#34;)&#34;:
+                result.append(rule)
+
+            # This is going to start handling the rule as if it is in multiple lines
+            elif rule and not rule.endswith(&#34;)&#34;) and rule != &#34;)&#34;:
+                temp.append(rule)
+                multi_line = True
+            # If the rule is multi-line and ends with a closing parenthesis, we join the temp list
+            elif multi_line and rule.endswith(&#34;)&#34;):
+                temp.append(rule)
+                result.append(&#34; &#34;.join(temp))
+                temp = []
+                multi_line = False
+
+        return result
+
+    def get_current_sid(self, start=10000, end=20000) -&gt; int:
+        &#34;&#34;&#34;
+        Description:
+            Get the current Snort ID Version (sid) from the rules file.
+            This function reads the rules file and extracts the sid from the first line.
+
+        Returns:
+            str: The current Snort ID Version (sid).
+        &#34;&#34;&#34;
+        # Get all the rules
+
+        rules = list(map(self.rule_splitter, self.get_rules_from_file()))
+        # Get all the sids from the rules
+        sids = list(map(lambda x: x.get(&#34;options&#34;, {}).get(&#34;sid&#34;), rules))
+
+        # Filter the sids to get the ones in the range
+        filtered_sids = [int(sid) for sid in sids if start &lt;= int(sid) &lt;= end]
+        current_sid = max(filtered_sids) + 1 if filtered_sids else start
+        return current_sid
+
+    def rule_splitter(self, rule: str) -&gt; dict:
+        &#34;&#34;&#34;
+        Description:
+            Parses a Snort rule string and extracts its configurations into a dictionary.
+
+        Args:
+            rule (str): The Snort rule string to be parsed.
+
+        Returns:
+            dict: A dictionary containing the parsed configurations of the rule.
+        &#34;&#34;&#34;
+        # Initialize the result dictionary
+        parsed_rule = {}
+
+        # Split the rule into header and options
+        header, options = rule.split(&#34;(&#34;, 1)
+        options = options.rstrip(&#34;)&#34;)
+
+        # Parse the header
+        header_parts = header.strip().split()
+        if len(header_parts) &gt;= 6:
+            parsed_rule[&#34;action&#34;] = header_parts[0]
+            parsed_rule[&#34;protocol&#34;] = header_parts[1]
+            parsed_rule[&#34;src_ip&#34;] = header_parts[2]
+            parsed_rule[&#34;src_port&#34;] = header_parts[3]
+            parsed_rule[&#34;direction&#34;] = header_parts[4]
+            parsed_rule[&#34;dst_ip&#34;] = header_parts[5]
+            parsed_rule[&#34;dst_port&#34;] = (
+                header_parts[6] if len(header_parts) &gt; 6 else &#34;any&#34;
+            )
+
+        # Parse the options
+        options_dict = {}
+        for option in options.split(&#34;;&#34;):
+            if &#34;:&#34; in option:
+                key, value = option.split(&#34;:&#34;, 1)
+                options_dict[key.strip()] = value.strip()
+            elif option.strip():
+                options_dict[option.strip()] = True
+
+        parsed_rule[&#34;options&#34;] = options_dict
+
+        return parsed_rule</code></pre>
+</details>
+<div class="desc"></div>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="fileagent.main.FileAgent" href="../main.html#fileagent.main.FileAgent">FileAgent</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.append_rule"><code class="name flex">
+<span>def <span class="ident">append_rule</span></span>(<span>self, data: dict)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def append_rule(self, data: dict):
+    &#34;&#34;&#34;
+    Description:
+    Append rule to the local.rules
+
+    Args:
+        data (str): Data to be appended to the local.rules file
+    &#34;&#34;&#34;
+
+    # Right now this is just a simple implementation
+
+    if (rule := self.rule_translator(data)) is None:
+        return
+
+    if self.rule_exists(rule):
+        return
+
+    # Backup the rules file
+    self.file_backup()
+
+    # Append the rule to the rules file
+    with open(self.rules_file, &#34;a&#34;) as file:
+        file.write(f&#34;\n{rule}\n&#34;)</code></pre>
+</details>
+<div class="desc"><p>Description:
+Append rule to the local.rules</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>str</code></dt>
+<dd>Data to be appended to the local.rules file</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.build_formatter"><code class="name flex">
+<span>def <span class="ident">build_formatter</span></span>(<span>self, parts: list[str], opts: list[str], pretty: bool = False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_formatter(
+    self, parts: list[str], opts: list[str], pretty: bool = False
+) -&gt; str:
+    print(parts)
+    header = &#34; &#34;.join(
+        list(map(lambda x: x if isinstance(x, str) else str(x), parts))
+    )
+
+    # compile rule
+    if pretty:
+        body = &#34;\n    &#34;.join(opts)
+        return f&#34;{header} (\n    {body}\n)&#34;
+    else:
+        body = &#34; &#34;.join(opts)
+        return f&#34;{header} ({body})&#34;</code></pre>
+</details>
+<div class="desc"></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.builder"><code class="name flex">
+<span>def <span class="ident">builder</span></span>(<span>self,<br>action: str = None,<br>rule_type: str = None,<br>protocol: str = None,<br>src_ip: str = None,<br>src_port: int = None,<br>direction: str = None,<br>dst_ip: str = None,<br>dst_port: int = None,<br>msg: str = None,<br>reference: list[tuple[str, str]] = None,<br>gid: int = None,<br>sid: int = None,<br>rev: int = None,<br>classtype: str = None,<br>priority: int = None,<br>metadata: dict[str, str] = None,<br>service_opt: list[str] = None,<br>rem: str = None,<br>file_meta: dict[str, str] = None,<br>content: list[dict[str, str]] = None,<br>pcre: list[str] = None,<br>regex: list[str] = None,<br>bufferlen: int = None,<br>isdataat: bool = None,<br>dsize: int = None,<br>flow: list[str] = None,<br>ttl: int = None,<br>ipopts: list[str] = None,<br>fragoffset: int = None,<br>fragbits: str = None,<br>priority_bit: str = None,<br>dce: str = None,<br>ssl_state: str = None,<br>verbose: bool = False) ‑> list[list[str]]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def builder(
+    self,
+    action: str = None,
+    rule_type: str = None,
+    protocol: str = None,
+    src_ip: str = None,
+    src_port: int = None,
+    direction: str = None,
+    dst_ip: str = None,
+    dst_port: int = None,
+    msg: str = None,
+    reference: list[tuple[str, str]] = None,
+    gid: int = None,
+    sid: int = None,
+    rev: int = None,
+    classtype: str = None,
+    priority: int = None,
+    metadata: dict[str, str] = None,
+    service_opt: list[str] = None,
+    rem: str = None,
+    file_meta: dict[str, str] = None,
+    content: list[dict[str, str]] = None,
+    pcre: list[str] = None,
+    regex: list[str] = None,
+    bufferlen: int = None,
+    isdataat: bool = None,
+    dsize: int = None,
+    flow: list[str] = None,
+    ttl: int = None,
+    ipopts: list[str] = None,
+    fragoffset: int = None,
+    fragbits: str = None,
+    priority_bit: str = None,
+    dce: str = None,
+    ssl_state: str = None,
+    verbose: bool = False,
+) -&gt; list[list[str]]:
+    &#34;&#34;&#34;
+    Description:
+        Builds a Snort rule string based on the provided parameters.
+
+        This function constructs a Snort rule by combining header fields, general options,
+        payload options, and non-payload options. It validates required fields and formats
+        the rule according to Snort syntax.
+
+    Args:
+        action (str): The action to take (e.g., &#39;alert&#39;, &#39;drop&#39;, &#39;log&#39;, etc.).
+        rule_type (str): The type of rule (&#39;traditional&#39;, &#39;service&#39;, &#39;file&#39;, &#39;file_id&#39;).
+        protocol (str): The protocol to match (&#39;ip&#39;, &#39;icmp&#39;, &#39;tcp&#39;, &#39;udp&#39;).
+        src_ip (str): The source IP address.
+        src_port (int): The source port number.
+        direction (str): The direction of traffic (&#39;-&gt;&#39;, &#39;&lt;&gt;&#39;).
+        dst_ip (str): The destination IP address.
+        dst_port (int): The destination port number.
+        msg (str): The message string for the rule.
+        reference (list[tuple[str, str]]): List of references as tuples (scheme, id).
+        gid (int): Group ID for the rule.
+        sid (int): Snort ID for the rule.
+        rev (int): Revision number for the rule.
+        classtype (str): Classification type for the rule.
+        priority (int): Priority level for the rule.
+        metadata (dict[str, str]): Metadata key-value pairs.
+        service_opt (list[str]): List of service options.
+        rem (str): Remarks for the rule.
+        file_meta (dict[str, str]): File metadata with keys like type, id, category, etc.
+        content (list[dict[str, str]]): Payload content options.
+        pcre (list[str]): List of PCRE strings.
+        regex (list[str]): List of regex strings.
+        bufferlen (int): Buffer length for payload matching.
+        isdataat (bool): Indicates if data is at a specific location.
+        dsize (int): Data size for payload matching.
+        flow (list[str]): List of flow options.
+        ttl (int): Time-to-live value.
+        ipopts (list[str]): List of IP options.
+        fragoffset (int): Fragment offset value.
+        fragbits (str): Fragment bits value.
+        priority_bit (str): Priority bit value.
+        dce (str): DCE/RPC options.
+        ssl_state (str): SSL state options.
+        pretty (bool): If True, formats the rule for readability.
+        verbose (bool): If True, prints the rule to the console.
+
+    Returns:
+        list[list[str]]: A list containing the parts and options of the snort rule.
+    &#34;&#34;&#34;
+
+    # build header
+    parts = []
+    if action in (
+        &#34;alert&#34;,
+        &#34;drop&#34;,
+        &#34;log&#34;,
+        &#34;pass&#34;,
+        &#34;block&#34;,
+        &#34;react&#34;,
+        &#34;reject&#34;,
+        &#34;rewrite&#34;,
+    ):
+        parts.append(action)
+
+    # service/file/file_id rules only need action and keyword
+    if rule_type in (&#34;service&#34;, &#34;file&#34;, &#34;file_id&#34;):
+        parts.append(rule_type)
+    else:
+        # Else it is considered traditional
+        for x in (protocol, src_ip, src_port):
+            if not x:
+                raise ValueError(&#34;protocol, src_ip, src_port required&#34;)
+            parts.append(x)
+
+        # if direction in (&#34;-&gt;&#34;, &#34;&lt;&gt;&#34;, None):
+        #     parts.append(direction or &#34;-&gt;&#34;)
+
+        parts.append(direction or &#34;-&gt;&#34;)
+        for x in (dst_ip, dst_port):
+            if not x:
+                raise ValueError(&#34;dst_ip,dst_port required&#34;)
+            parts.append(x)
+
+    # build options
+    opts = []
+
+    def opt(name, val):
+        &#34;&#34;&#34;
+        Description:
+            Helper function to append options to the opts list.
+            If val is a list, it appends each value with the name.
+            If val is not None, it appends the name and value.
+
+        Args:
+            name (str): The name of the option.
+            val (any): The value of the option, can be a list or a single value.
+        &#34;&#34;&#34;
+        if isinstance(val, list):
+            for v in val:
+                opts.append(f&#34;{name}:{v};&#34;)
+        elif val is not None:
+            opts.append(f&#34;{name}:{val};&#34;)
+
+    # general opts
+    if msg:
+        opts.append(f&#34;msg:&#39;{msg}&#39;;&#34;)
+    if reference:
+        # reference is a list of tuples (scheme, id)
+        # e.g. [(&#39;url&#39;, &#39;example.com&#39;), (&#39;cve&#39;, &#39;CVE-2023-1234&#39;)]
+        if not isinstance(reference, list):
+            raise ValueError(&#34;reference must be a list of tuples&#34;)
+        for scheme, rid in reference:
+            opts.append(f&#34;reference:{scheme},{rid};&#34;)
+
+    opt(&#34;gid&#34;, gid)
+    opt(&#34;sid&#34;, sid)
+    opt(&#34;rev&#34;, rev)
+
+    if classtype:
+        opts.append(f&#34;classtype:{classtype};&#34;)
+
+    opt(&#34;priority&#34;, priority)
+
+    if metadata:
+        pairs = [f&#34;{k} {v}&#34; for k, v in metadata.items()]
+        opts.append(f&#34;metadata:{&#39;,&#39;.join(pairs)};&#34;)
+
+    if service_opt:
+        opts.append(f&#34;service:{&#39;,&#39;.join(service_opt)};&#34;)
+
+    if rem:
+        opts.append(f&#34;rem:&#39;{rem}&#39;;&#34;)
+
+    if file_meta:
+        fm = file_meta
+        parts = [f&#34;type {fm[&#39;type&#39;]}&#34;, f&#34;id {fm[&#39;id&#39;]}&#34;]
+        for k in (&#34;category&#34;, &#34;group&#34;, &#34;version&#34;):
+            if fm.get(k):
+                parts.append(f&#34;{k} &#39;{fm[k]}&#39;&#34;)
+        opts.append(f&#34;file_meta:{&#39;,&#39;.join(parts)};&#34;)
+
+    # payload opts example
+    if content:
+        for c in content:
+            segs = [f&#34;content:&#39;{c[&#39;value&#39;]}&#39;&#34;]
+            for m in (
+                &#34;fast_pattern&#34;,
+                &#34;nocase&#34;,
+                &#34;offset&#34;,
+                &#34;depth&#34;,
+                &#34;distance&#34;,
+                &#34;within&#34;,
+                &#34;width&#34;,
+                &#34;endian&#34;,
+            ):
+                v = c.get(m)
+                if isinstance(v, bool) and v:
+                    segs.append(m)
+                elif v not in (None, False):
+                    segs.append(f&#34;{m} {v}&#34;)
+            opts.append(f&#34;{&#39;,&#39;.join(segs)};&#34;)
+
+    # pcre, regex examples
+    if pcre:
+        for r in pcre:
+            opts.append(f&#34;pcre:&#39;{r}&#39;;&#34;)
+
+    if regex:
+        for r in regex:
+            opts.append(f&#34;regex:&#39;{r}&#39;;&#34;)
+
+    # non-payload example
+    if flow:
+        opts.append(f&#34;flow:{&#39;,&#39;.join(flow)};&#34;)
+
+    if verbose:
+        print(&#34;Nothing to verbose. For now &#34;)
+    return parts, opts</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Builds a Snort rule string based on the provided parameters.</p>
+<p>This function constructs a Snort rule by combining header fields, general options,
+payload options, and non-payload options. It validates required fields and formats
+the rule according to Snort syntax.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>action</code></strong> :&ensp;<code>str</code></dt>
+<dd>The action to take (e.g., 'alert', 'drop', 'log', etc.).</dd>
+<dt><strong><code>rule_type</code></strong> :&ensp;<code>str</code></dt>
+<dd>The type of rule ('traditional', 'service', 'file', 'file_id').</dd>
+<dt><strong><code>protocol</code></strong> :&ensp;<code>str</code></dt>
+<dd>The protocol to match ('ip', 'icmp', 'tcp', 'udp').</dd>
+<dt><strong><code>src_ip</code></strong> :&ensp;<code>str</code></dt>
+<dd>The source IP address.</dd>
+<dt><strong><code>src_port</code></strong> :&ensp;<code>int</code></dt>
+<dd>The source port number.</dd>
+<dt><strong><code>direction</code></strong> :&ensp;<code>str</code></dt>
+<dd>The direction of traffic ('-&gt;', '&lt;&gt;').</dd>
+<dt><strong><code>dst_ip</code></strong> :&ensp;<code>str</code></dt>
+<dd>The destination IP address.</dd>
+<dt><strong><code>dst_port</code></strong> :&ensp;<code>int</code></dt>
+<dd>The destination port number.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code></dt>
+<dd>The message string for the rule.</dd>
+<dt><strong><code>reference</code></strong> :&ensp;<code>list[tuple[str, str]]</code></dt>
+<dd>List of references as tuples (scheme, id).</dd>
+<dt><strong><code>gid</code></strong> :&ensp;<code>int</code></dt>
+<dd>Group ID for the rule.</dd>
+<dt><strong><code>sid</code></strong> :&ensp;<code>int</code></dt>
+<dd>Snort ID for the rule.</dd>
+<dt><strong><code>rev</code></strong> :&ensp;<code>int</code></dt>
+<dd>Revision number for the rule.</dd>
+<dt><strong><code>classtype</code></strong> :&ensp;<code>str</code></dt>
+<dd>Classification type for the rule.</dd>
+<dt><strong><code>priority</code></strong> :&ensp;<code>int</code></dt>
+<dd>Priority level for the rule.</dd>
+<dt><strong><code>metadata</code></strong> :&ensp;<code>dict[str, str]</code></dt>
+<dd>Metadata key-value pairs.</dd>
+<dt><strong><code>service_opt</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>List of service options.</dd>
+<dt><strong><code>rem</code></strong> :&ensp;<code>str</code></dt>
+<dd>Remarks for the rule.</dd>
+<dt><strong><code>file_meta</code></strong> :&ensp;<code>dict[str, str]</code></dt>
+<dd>File metadata with keys like type, id, category, etc.</dd>
+<dt><strong><code>content</code></strong> :&ensp;<code>list[dict[str, str]]</code></dt>
+<dd>Payload content options.</dd>
+<dt><strong><code>pcre</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>List of PCRE strings.</dd>
+<dt><strong><code>regex</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>List of regex strings.</dd>
+<dt><strong><code>bufferlen</code></strong> :&ensp;<code>int</code></dt>
+<dd>Buffer length for payload matching.</dd>
+<dt><strong><code>isdataat</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Indicates if data is at a specific location.</dd>
+<dt><strong><code>dsize</code></strong> :&ensp;<code>int</code></dt>
+<dd>Data size for payload matching.</dd>
+<dt><strong><code>flow</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>List of flow options.</dd>
+<dt><strong><code>ttl</code></strong> :&ensp;<code>int</code></dt>
+<dd>Time-to-live value.</dd>
+<dt><strong><code>ipopts</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>List of IP options.</dd>
+<dt><strong><code>fragoffset</code></strong> :&ensp;<code>int</code></dt>
+<dd>Fragment offset value.</dd>
+<dt><strong><code>fragbits</code></strong> :&ensp;<code>str</code></dt>
+<dd>Fragment bits value.</dd>
+<dt><strong><code>priority_bit</code></strong> :&ensp;<code>str</code></dt>
+<dd>Priority bit value.</dd>
+<dt><strong><code>dce</code></strong> :&ensp;<code>str</code></dt>
+<dd>DCE/RPC options.</dd>
+<dt><strong><code>ssl_state</code></strong> :&ensp;<code>str</code></dt>
+<dd>SSL state options.</dd>
+<dt><strong><code>pretty</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If True, formats the rule for readability.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If True, prints the rule to the console.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[list[str]]</code></dt>
+<dd>A list containing the parts and options of the snort rule.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert"><code class="name flex">
+<span>def <span class="ident">building_rule_alert</span></span>(<span>self, target: str, msg: str = None, verbose=False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def building_rule_alert(self, target: str, msg: str = None, verbose=False) -&gt; str:
+    &#34;&#34;&#34;
+    Builds a Snort rule to alert on IP traffic from a specific target.
+
+    Args:
+        target (str): The target IP address.
+        msg (str, optional): Custom message for the rule. Defaults to None.
+        verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+    Returns:
+        str: The formatted Snort rule string.
+    &#34;&#34;&#34;
+    parts, opts = self.builder(
+        action=&#34;alert&#34;,
+        protocol=&#34;ip&#34;,
+        src_ip=target,
+        src_port=&#34;any&#34;,
+        direction=&#34;-&gt;&#34;,
+        dst_ip=&#34;$HOME_NET&#34;,
+        dst_port=&#34;any&#34;,
+        msg=msg or f&#34;IP Alert Incoming From IP {target}&#34;,
+        classtype=&#34;tcp-connection&#34;,
+        sid=28154103,
+        rev=1,
+        reference=[(&#34;url&#34;, &#34;https://misp.gsma.com/events/view/19270&#34;)],
+    )
+
+    rule = self.build_formatter(parts, opts, pretty=True)
+    if verbose:
+        print(rule)
+
+    return rule</code></pre>
+</details>
+<div class="desc"><p>Builds a Snort rule to alert on IP traffic from a specific target.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target</code></strong> :&ensp;<code>str</code></dt>
+<dd>The target IP address.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Custom message for the rule. Defaults to None.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, prints the rule. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The formatted Snort rule string.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp"><code class="name flex">
+<span>def <span class="ident">building_rule_alert_icmp</span></span>(<span>self, target: str, msg: str = None, verbose=False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def building_rule_alert_icmp(
+    self, target: str, msg: str = None, verbose=False
+) -&gt; str:
+    &#34;&#34;&#34;
+    Builds a Snort rule to alert on ICMP traffic from a specific target.
+
+    Args:
+        target (str): The target IP address.
+        msg (str, optional): Custom message for the rule. Defaults to None.
+        verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+    Returns:
+        str: The formatted Snort rule string.
+    &#34;&#34;&#34;
+    parts, opts = self.builder(
+        action=&#34;alert&#34;,
+        protocol=&#34;icmp&#34;,
+        src_ip=target,
+        src_port=&#34;any&#34;,
+        direction=&#34;-&gt;&#34;,
+        dst_ip=&#34;$HOME_NET&#34;,
+        dst_port=&#34;any&#34;,
+        sid=self.get_current_sid(),
+        msg=msg or f&#34;Alert ICMP From IP {target}&#34;,
+    )
+
+    rule = self.build_formatter(parts, opts, pretty=True)
+
+    if verbose:
+        print(rule)
+    return rule</code></pre>
+</details>
+<div class="desc"><p>Builds a Snort rule to alert on ICMP traffic from a specific target.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target</code></strong> :&ensp;<code>str</code></dt>
+<dd>The target IP address.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Custom message for the rule. Defaults to None.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, prints the rule. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The formatted Snort rule string.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_block"><code class="name flex">
+<span>def <span class="ident">building_rule_block</span></span>(<span>self, target: str, msg: str = None, verbose=False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def building_rule_block(self, target: str, msg: str = None, verbose=False) -&gt; str:
+    &#34;&#34;&#34;
+    Builds a Snort rule to block HTTP traffic from a specific target.
+
+    Args:
+        target (str): The target IP address or domain.
+        msg (str, optional): Custom message for the rule. Defaults to None.
+        verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+    Returns:
+        str: The formatted Snort rule string.
+    &#34;&#34;&#34;
+    parts, opts = self.builder(
+        action=&#34;block&#34;,
+        protocol=&#34;http&#34;,
+        src_ip=target,
+        src_port=&#34;any&#34;,
+        direction=&#34;-&gt;&#34;,
+        dst_ip=&#34;$HOME_NET&#34;,
+        dst_port=&#34;any&#34;,
+        sid=self.get_current_sid(),
+        msg=msg or f&#34;Block traffic From IP {target}&#34;,
+    )
+
+    rule = self.build_formatter(parts, opts, pretty=True)
+    if verbose:
+        print(rule)
+    return rule</code></pre>
+</details>
+<div class="desc"><p>Builds a Snort rule to block HTTP traffic from a specific target.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target</code></strong> :&ensp;<code>str</code></dt>
+<dd>The target IP address or domain.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Custom message for the rule. Defaults to None.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, prints the rule. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The formatted Snort rule string.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain"><code class="name flex">
+<span>def <span class="ident">building_rule_block_domain</span></span>(<span>self, domain: str, msg: str = None, verbose=False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def building_rule_block_domain(
+    self, domain: str, msg: str = None, verbose=False
+) -&gt; str:
+    &#34;&#34;&#34;
+    Builds a Snort rule to block traffic to a specific domain.
+
+    Args:
+        domain (str): The target domain to block.
+        msg (str, optional): Custom message for the rule. Defaults to None.
+        verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+    Returns:
+        str: The formatted Snort rule string.
+    &#34;&#34;&#34;
+
+    parts, opts = self.builder(
+        action=&#34;block&#34;,
+        protocol=&#34;ssl&#34;,
+        src_ip=&#34;any&#34;,
+        src_port=&#34;any&#34;,
+        direction=&#34;-&gt;&#34;,
+        dst_ip=&#34;$HOME_NET&#34;,
+        dst_port=443,
+        sid=self.get_current_sid(),
+        msg=msg or f&#34;Block domain {domain}&#34;,
+        content=[{&#34;value&#34;: self.to_hex(domain)}],
+    )
+
+    rule = self.build_formatter(parts, opts, pretty=True)
+
+    if verbose:
+        print(rule)
+    return rule</code></pre>
+</details>
+<div class="desc"><p>Builds a Snort rule to block traffic to a specific domain.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>domain</code></strong> :&ensp;<code>str</code></dt>
+<dd>The target domain to block.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Custom message for the rule. Defaults to None.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, prints the rule. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The formatted Snort rule string.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_icmp"><code class="name flex">
+<span>def <span class="ident">building_rule_block_icmp</span></span>(<span>self, target: str, msg: str = None, verbose=False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def building_rule_block_icmp(
+    self, target: str, msg: str = None, verbose=False
+) -&gt; str:
+    &#34;&#34;&#34;
+    Builds a Snort rule to block ICMP traffic from a specific target.
+
+    Args:
+        target (str): The target IP address.
+        msg (str, optional): Custom message for the rule. Defaults to None.
+        verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+    Returns:
+        str: The formatted Snort rule string.
+    &#34;&#34;&#34;
+    parts, opts = self.builder(
+        action=&#34;block&#34;,
+        protocol=&#34;icmp&#34;,
+        src_ip=target,
+        src_port=&#34;any&#34;,
+        direction=&#34;-&gt;&#34;,
+        dst_ip=&#34;$HOME_NET&#34;,
+        dst_port=&#34;any&#34;,
+        sid=self.get_current_sid(),
+        msg=msg or f&#34;Block ICMP From IP {target}&#34;,
+    )
+
+    rule = self.build_formatter(parts, opts, pretty=True)
+    if verbose:
+        print(rule)
+    return rule</code></pre>
+</details>
+<div class="desc"><p>Builds a Snort rule to block ICMP traffic from a specific target.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>target</code></strong> :&ensp;<code>str</code></dt>
+<dd>The target IP address.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Custom message for the rule. Defaults to None.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, prints the rule. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The formatted Snort rule string.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.get_current_sid"><code class="name flex">
+<span>def <span class="ident">get_current_sid</span></span>(<span>self, start=10000, end=20000) ‑> int</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_current_sid(self, start=10000, end=20000) -&gt; int:
+    &#34;&#34;&#34;
+    Description:
+        Get the current Snort ID Version (sid) from the rules file.
+        This function reads the rules file and extracts the sid from the first line.
+
+    Returns:
+        str: The current Snort ID Version (sid).
+    &#34;&#34;&#34;
+    # Get all the rules
+
+    rules = list(map(self.rule_splitter, self.get_rules_from_file()))
+    # Get all the sids from the rules
+    sids = list(map(lambda x: x.get(&#34;options&#34;, {}).get(&#34;sid&#34;), rules))
+
+    # Filter the sids to get the ones in the range
+    filtered_sids = [int(sid) for sid in sids if start &lt;= int(sid) &lt;= end]
+    current_sid = max(filtered_sids) + 1 if filtered_sids else start
+    return current_sid</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Get the current Snort ID Version (sid) from the rules file.
+This function reads the rules file and extracts the sid from the first line.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The current Snort ID Version (sid).</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request"><code class="name flex">
+<span>def <span class="ident">get_ip_from_request</span></span>(<span>self, request: dict) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_ip_from_request(self, request: dict) -&gt; str:
+    &#34;&#34;&#34;
+    Description:
+        Get the ip address from the request
+
+    Args:
+        request (dict): Request data to be checked for ip address
+
+    Returns:
+        str: The ip address from the request
+    &#34;&#34;&#34;
+
+    if request.get(&#34;content_type&#34;) == &#34;application/json&#34;:
+        data = json.loads(request.get(&#34;content&#34;))
+        return data.get(&#34;ip&#34;)
+    elif request.get(&#34;content_type&#34;) == &#34;text/plain&#34;:
+        return self.ip_matches(request.get(&#34;content&#34;))
+    else:
+        return None</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Get the ip address from the request</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>request</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Request data to be checked for ip address</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The ip address from the request</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.get_rules_from_file"><code class="name flex">
+<span>def <span class="ident">get_rules_from_file</span></span>(<span>self) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_rules_from_file(self) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Description:
+        Get the rules from the rules file
+        This function reads the rules file and returns a list of rules.
+        It removes comments and empty lines from the rules.
+
+    Returns:
+        list[str]: List of rules from the rules file
+    &#34;&#34;&#34;
+    with open(self.rules_file, &#34;r&#34;) as file:
+        return self.read_snort_rules(rules=file.readlines())</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Get the rules from the rules file
+This function reads the rules file and returns a list of rules.
+It removes comments and empty lines from the rules.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>List of rules from the rules file</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.ip_matches"><code class="name flex">
+<span>def <span class="ident">ip_matches</span></span>(<span>self, data: str) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ip_matches(self, data: str) -&gt; str:
+    &#34;&#34;&#34;
+    Description:
+        Check if the data contains an ip address. Checks for ipv4, ipv6 and url
+
+    Args:
+        data (str): Data to be checked for ip address
+
+    Returns:
+        str: the ip/url regex matching case
+    &#34;&#34;&#34;
+    ipv4_pattern = r&#34;\b(?:\d{1,3}\.){3}\d{1,3}\b&#34;
+    ipv6_pattern = r&#34;\b(?:[a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}\b&#34;
+    url_pattern = r&#34;\bhttps?://[^\s/$.?#].[^\s]*\b&#34;
+
+    for pattern in [ipv4_pattern, ipv6_pattern, url_pattern]:
+        match = re.search(pattern, data)
+        if match:
+            return match.group(0)
+    return None</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Check if the data contains an ip address. Checks for ipv4, ipv6 and url</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>str</code></dt>
+<dd>Data to be checked for ip address</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>the ip/url regex matching case</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.read_snort_rules"><code class="name flex">
+<span>def <span class="ident">read_snort_rules</span></span>(<span>self, rules: list[str]) ‑> list[str]</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_snort_rules(self, rules: list[str]) -&gt; list[str]:
+    &#34;&#34;&#34;
+    Processes a list of Snort rules and returns a list of valid rules.
+
+    This method filters out comments, handles multi-line rules, and ensures
+    that only properly formatted rules are included in the result.
+
+    Args:
+        rules (list[str]): A list of strings representing Snort rules.
+
+    Returns:
+        list[str]: A list of processed Snort rules. Single-line rules are
+        included directly, while multi-line rules are concatenated into
+        single strings.
+    &#34;&#34;&#34;
+
+    # rules =
+    result = []
+    temp = []
+    multi_line = False
+    for rule in rules:
+        # Remove comments and strip whitespace
+        rule = rule.strip()
+        if rule.startswith(&#34;#&#34;):
+            continue
+
+        # This will only get the rules that are one lined
+        if rule and rule.endswith(&#34;)&#34;) and rule != &#34;)&#34;:
+            result.append(rule)
+
+        # This is going to start handling the rule as if it is in multiple lines
+        elif rule and not rule.endswith(&#34;)&#34;) and rule != &#34;)&#34;:
+            temp.append(rule)
+            multi_line = True
+        # If the rule is multi-line and ends with a closing parenthesis, we join the temp list
+        elif multi_line and rule.endswith(&#34;)&#34;):
+            temp.append(rule)
+            result.append(&#34; &#34;.join(temp))
+            temp = []
+            multi_line = False
+
+    return result</code></pre>
+</details>
+<div class="desc"><p>Processes a list of Snort rules and returns a list of valid rules.</p>
+<p>This method filters out comments, handles multi-line rules, and ensures
+that only properly formatted rules are included in the result.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rules</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>A list of strings representing Snort rules.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>A list of processed Snort rules. Single-line rules are</dd>
+</dl>
+<p>included directly, while multi-line rules are concatenated into
+single strings.</p></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.rule_exists"><code class="name flex">
+<span>def <span class="ident">rule_exists</span></span>(<span>self, rule)</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rule_exists(self, rule):
+    &#34;&#34;&#34;
+    Description:
+        Check if the rule already exists in the rules file
+        This function reads the rules file line by line and determines if the
+        provided rule is present in any of the lines. It is useful for avoiding
+        duplicate entries in the rules file.
+
+    Args:
+        rule (str): Rule to be checked
+
+    Returns:
+        bool: True if the rule exists, False otherwise
+    &#34;&#34;&#34;
+
+    # This needs to change if we are going to go with the pretty building of the rule
+
+    with open(self.rules_file, &#34;r&#34;) as file:
+        rules = self.read_snort_rules(rules=file.readlines())
+        # For now this function can&#39;t accurately check if a snort rule is duplicate,
+        # because of the different sids
+
+        # rules = list(map(self.rule_splitter, rules))
+        # rule_obj = self.rule_splitter(rule)
+        if any(rule in rule_line for rule_line in rules):
+            return True
+        return False</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Check if the rule already exists in the rules file
+This function reads the rules file line by line and determines if the
+provided rule is present in any of the lines. It is useful for avoiding
+duplicate entries in the rules file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>str</code></dt>
+<dd>Rule to be checked</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the rule exists, False otherwise</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.rule_splitter"><code class="name flex">
+<span>def <span class="ident">rule_splitter</span></span>(<span>self, rule: str) ‑> dict</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rule_splitter(self, rule: str) -&gt; dict:
+    &#34;&#34;&#34;
+    Description:
+        Parses a Snort rule string and extracts its configurations into a dictionary.
+
+    Args:
+        rule (str): The Snort rule string to be parsed.
+
+    Returns:
+        dict: A dictionary containing the parsed configurations of the rule.
+    &#34;&#34;&#34;
+    # Initialize the result dictionary
+    parsed_rule = {}
+
+    # Split the rule into header and options
+    header, options = rule.split(&#34;(&#34;, 1)
+    options = options.rstrip(&#34;)&#34;)
+
+    # Parse the header
+    header_parts = header.strip().split()
+    if len(header_parts) &gt;= 6:
+        parsed_rule[&#34;action&#34;] = header_parts[0]
+        parsed_rule[&#34;protocol&#34;] = header_parts[1]
+        parsed_rule[&#34;src_ip&#34;] = header_parts[2]
+        parsed_rule[&#34;src_port&#34;] = header_parts[3]
+        parsed_rule[&#34;direction&#34;] = header_parts[4]
+        parsed_rule[&#34;dst_ip&#34;] = header_parts[5]
+        parsed_rule[&#34;dst_port&#34;] = (
+            header_parts[6] if len(header_parts) &gt; 6 else &#34;any&#34;
+        )
+
+    # Parse the options
+    options_dict = {}
+    for option in options.split(&#34;;&#34;):
+        if &#34;:&#34; in option:
+            key, value = option.split(&#34;:&#34;, 1)
+            options_dict[key.strip()] = value.strip()
+        elif option.strip():
+            options_dict[option.strip()] = True
+
+    parsed_rule[&#34;options&#34;] = options_dict
+
+    return parsed_rule</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Parses a Snort rule string and extracts its configurations into a dictionary.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>rule</code></strong> :&ensp;<code>str</code></dt>
+<dd>The Snort rule string to be parsed.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict</code></dt>
+<dd>A dictionary containing the parsed configurations of the rule.</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.rule_translator"><code class="name flex">
+<span>def <span class="ident">rule_translator</span></span>(<span>self, data: dict) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rule_translator(self, data: dict) -&gt; str:
+    &#34;&#34;&#34;
+    Description:
+        Translate the data into a rule
+        Right now this is a simple implementation
+        Checks if it is a json or text file and extracts the ip address
+
+    Args:
+        data (dict): Data from the post request to be translated into a rule,
+
+    Returns:
+        str: Rule to be appended to the rules file
+    &#34;&#34;&#34;
+
+    tranlator_book = {
+        &#34;block_ip&#34;: self.building_rule_block,
+        &#34;block_domain&#34;: self.building_rule_block_domain,
+        &#34;alert_ip&#34;: self.building_rule_alert,
+        &#34;block_icmp&#34;: self.building_rule_block_icmp,
+    }
+
+    rule = None
+
+    if (command := data.get(&#34;command&#34;)) in tranlator_book.keys():
+        rule = tranlator_book[command](data.get(&#34;target&#34;))
+    return rule</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Translate the data into a rule
+Right now this is a simple implementation
+Checks if it is a json or text file and extracts the ip address</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Data from the post request to be translated into a rule,</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Rule to be appended to the rules file</dd>
+</dl></div>
+</dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.to_hex"><code class="name flex">
+<span>def <span class="ident">to_hex</span></span>(<span>self, domain: str) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_hex(self, domain: str) -&gt; str:
+    &#34;&#34;&#34;
+    Description:
+        Convert a domain to hex format for snort rules
+
+    Args:
+        domain (str): Domain to be converted
+
+    Returns:
+        str: Hex representation of the domain
+    &#34;&#34;&#34;
+    return &#34; &#34;.join(f&#34;{ord(c):02x}&#34; for c in domain)</code></pre>
+</details>
+<div class="desc"><h2 id="description">Description</h2>
+<p>Convert a domain to hex format for snort rules</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>domain</code></strong> :&ensp;<code>str</code></dt>
+<dd>Domain to be converted</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Hex representation of the domain</dd>
+</dl></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="fileagent.managers" href="index.html">fileagent.managers</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="fileagent.managers.manager_snort.ManagerSnort" href="#fileagent.managers.manager_snort.ManagerSnort">ManagerSnort</a></code></h4>
+<ul class="">
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.append_rule" href="#fileagent.managers.manager_snort.ManagerSnort.append_rule">append_rule</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.build_formatter" href="#fileagent.managers.manager_snort.ManagerSnort.build_formatter">build_formatter</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.builder" href="#fileagent.managers.manager_snort.ManagerSnort.builder">builder</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert">building_rule_alert</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp">building_rule_alert_icmp</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_block">building_rule_block</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain">building_rule_block_domain</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_icmp" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_block_icmp">building_rule_block_icmp</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_current_sid" href="#fileagent.managers.manager_snort.ManagerSnort.get_current_sid">get_current_sid</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request" href="#fileagent.managers.manager_snort.ManagerSnort.get_ip_from_request">get_ip_from_request</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.get_rules_from_file" href="#fileagent.managers.manager_snort.ManagerSnort.get_rules_from_file">get_rules_from_file</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.ip_matches" href="#fileagent.managers.manager_snort.ManagerSnort.ip_matches">ip_matches</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.read_snort_rules" href="#fileagent.managers.manager_snort.ManagerSnort.read_snort_rules">read_snort_rules</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_exists" href="#fileagent.managers.manager_snort.ManagerSnort.rule_exists">rule_exists</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_splitter" href="#fileagent.managers.manager_snort.ManagerSnort.rule_splitter">rule_splitter</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.rule_translator" href="#fileagent.managers.manager_snort.ManagerSnort.rule_translator">rule_translator</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.to_hex" href="#fileagent.managers.manager_snort.ManagerSnort.to_hex">to_hex</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "file": "Block Domain",
+  "command": "block_domain",
+  "target": "training.testserver.gr"
+}

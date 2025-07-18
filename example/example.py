@@ -30,4 +30,4 @@ class Example(FileAgent):
 
 if __name__ == "__main__":
     agent = FileAgent()
-    agent.main()
+    agent.run_uvicorn()
