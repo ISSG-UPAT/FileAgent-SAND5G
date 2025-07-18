@@ -12,4 +12,9 @@ src/fileagent.egg-info/dependency_links.txt
 src/fileagent.egg-info/entry_points.txt
 src/fileagent.egg-info/requires.txt
 src/fileagent.egg-info/top_level.txt
+src/fileagent/managers/__init__.py
+src/fileagent/managers/manager_api.py
+src/fileagent/managers/manager_arguments.py
+src/fileagent/managers/manager_files.py
+src/fileagent/managers/manager_snort.py
 tests/test_fileagent.py
