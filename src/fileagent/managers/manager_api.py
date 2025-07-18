@@ -70,9 +70,13 @@ class ManagerAPI:
             if notifications is None:
                 raise HTTPException(status_code=404, detail="No notifications found")
 
+            history = notifications.get("history")
+
             return {
                 "message": "Dashboard is ready",
-                "notifications": notifications,
+                "latest": history[-1] if history else None,
+                "timestamp": time.time(),
+                "notifications": history[1:] if len(history) > 1 else [],
             }
 
     async def upload_functionality(self, file: UploadFile):
