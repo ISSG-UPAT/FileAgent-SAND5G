@@ -177,6 +177,159 @@ class ManagerSnort:
             print(rule)
         return rule
 
+    def build_snort_rule(
+        self,
+        # header fields
+        action: str = None,  # e.g. 'alert','drop','log','pass','block','react','reject','rewrite'
+        rule_type: str = None,  # 'traditional','service','file','file_id'
+        protocol: str = None,  # 'ip','icmp','tcp','udp' or service names
+        src_ip: str = None,  # Source IP address
+        src_port: int = None,  # Source port number
+        direction: str = None,  # '->','<>'
+        dst_ip: str = None,  # Destination IP address
+        dst_port: int = None,  # Destination port number
+        # general options
+        msg: str = None,  # Message string
+        reference: list[
+            tuple[str, str]
+        ] = None,  # List of tuples [('url','example.com'),...]
+        gid: int = None,  # Group ID
+        sid: int = None,  # Snort ID
+        rev: int = None,  # Revision number
+        classtype: str = None,  # Classification type
+        priority: int = None,  # Priority level
+        metadata: dict[str, str] = None,  # Metadata dictionary with key-value pairs
+        service_opt: list[str] = None,  # List of service options
+        rem: str = None,  # Remarks
+        file_meta: dict[
+            str, str
+        ] = None,  # File metadata dictionary with keys type, id, category, group, version
+        # payload options
+        content: list[
+            dict[str, str]
+        ] = None,  # List of dictionaries with payload options
+        pcre: list[str] = None,  # List of PCRE strings
+        regex: list[str] = None,  # List of regex strings
+        bufferlen: int = None,  # Buffer length
+        isdataat: bool = None,  # Boolean indicating if data is at a specific location
+        dsize: int = None,  # Data size
+        # non-payload and post-detect (examples)
+        flow: list[str] = None,  # List of flow options
+        ttl: int = None,  # Time-to-live value
+        ipopts: list[str] = None,  # List of IP options
+        fragoffset: int = None,  # Fragment offset
+        fragbits: str = None,  # Fragment bits
+        priority_bit: str = None,  # Priority bit
+        dce: str = None,  # DCE/RPC options
+        ssl_state: str = None,  # SSL state options
+        # other options as needed
+    ):
+        """Build a Snort rule string from provided parameters."""
+        # build header
+        parts = []
+        if action in (
+            "alert",
+            "drop",
+            "log",
+            "pass",
+            "block",
+            "react",
+            "reject",
+            "rewrite",
+        ):
+            parts.append(action)
+
+        # service/file/file_id rules only need action and keyword
+        if rule_type in ("service", "file", "file_id"):
+            if rule_type == "traditional":
+                pass
+            else:
+                parts.append(rule_type)
+        else:
+            for x in (protocol, src_ip, src_port):
+                if not x:
+                    raise ValueError("protocol, src_ip, src_port required")
+                parts.append(x)
+            parts.append(direction or "->")
+            for x in (dst_ip, dst_port):
+                if not x:
+                    raise ValueError("dst_ip,dst_port required")
+                parts.append(x)
+
+        header = " ".join(parts)
+
+        # build options
+        opts = []
+
+        def opt(name, val):
+            if isinstance(val, list):
+                for v in val:
+                    opts.append(f"{name}:{v};")
+            elif val is not None:
+                opts.append(f"{name}:{val};")
+
+        # general opts
+        if msg:
+            opts.append(f"msg:'{msg}';")
+        if reference:
+            for scheme, rid in reference:
+                opts.append(f"reference:{scheme},{rid};")
+        opt("gid", gid)
+        opt("sid", sid)
+        opt("rev", rev)
+        if classtype:
+            opts.append(f"classtype:{classtype};")
+        opt("priority", priority)
+        if metadata:
+            pairs = [f"{k} {v}" for k, v in metadata.items()]
+            opts.append(f"metadata:{','.join(pairs)};")
+        if service_opt:
+            opts.append(f"service:{','.join(service_opt)};")
+        if rem:
+            opts.append(f"rem:'{rem}';")
+        if file_meta:
+            fm = file_meta
+            parts = [f"type {fm['type']}", f"id {fm['id']}"]
+            for k in ("category", "group", "version"):
+                if fm.get(k):
+                    parts.append(f"{k} '{fm[k]}'")
+            opts.append(f"file_meta:{','.join(parts)};")
+        # payload opts example
+        if content:
+            for c in content:
+                segs = [f"content:'{c['value']}'"]
+                for m in (
+                    "fast_pattern",
+                    "nocase",
+                    "offset",
+                    "depth",
+                    "distance",
+                    "within",
+                    "width",
+                    "endian",
+                ):
+                    v = c.get(m)
+                    if isinstance(v, bool) and v:
+                        segs.append(m)
+                    elif v not in (None, False):
+                        segs.append(f"{m} {v}")
+                opts.append(f"{','.join(segs)};")
+        # pcre, regex examples
+        if pcre:
+            for r in pcre:
+                opts.append(f"pcre:'{r}';")
+        if regex:
+            for r in regex:
+                opts.append(f"regex:'{r}';")
+        # non-payload example
+        if flow:
+            opts.append(f"flow:{','.join(flow)};")
+        # compile rule
+        body = "\n    ".join(opts)
+        return f"{header} (\n    {body}\n)"
+
+        #
+
     def to_hex(self, domain: str) -> str:
         """
         Description:
