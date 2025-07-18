@@ -1,6 +1,7 @@
 from pathlib import Path
 import datetime
 import inspect
+import json
 
 
 class ManagerFiles:
@@ -99,6 +100,8 @@ class ManagerFiles:
         if not self.history_file.exists():
             self.history_file.parent.mkdir(parents=True, exist_ok=True)
             self.history_file.touch()
+            with open(self.history_file, "w") as file:
+                json.dump({}, file)
         return self.history_file
 
     def get_file_content(self, filepath, filetype: str = None):
@@ -106,10 +109,60 @@ class ManagerFiles:
         with open(filepath, "r") as file:
             content = file.read()
         if filetype == "json":
-            import json
-
             return json.loads(content)
         elif filetype == "txt":
             return content.splitlines()
         else:
             return content
+
+    def save_file_content(self, filepath, content, filetype: str = None):
+        """
+        Description:
+            Saves the content of a file to the specified filepath.
+            If the filetype is 'json', it saves the content as a JSON string.
+            If the filetype is 'txt', it saves the content as plain text.
+            If no filetype is specified, it saves the content as a plain text file.
+
+        Args:
+            filepath (str): The path where the file should be saved.
+            filetype (str, optional): The type of the file ('json', 'txt'). Defaults to None.
+
+        Returns:
+            None
+        """
+
+        with open(filepath, "w") as file:
+            if filetype == "json":
+
+                json.dump(content, file)
+            elif filetype == "txt":
+                file.write("\n".join(content))
+            else:
+                file.write(content)
+
+    def save_file_json(self, filepath, content):
+        """
+        Description:
+            Saves the content of a file to the specified filepath in JSON format.
+            This method reads the content from `self.content`, which should be a dictionary,
+            and writes it to the specified file as a JSON string.
+
+        Args:
+            filepath (str): The path where the file should be saved.
+
+        Returns:
+            None
+        """
+
+        original = self.get_file_content(filepath, "json")
+        if not original:
+            original = {}
+        original.update(content)
+        self.save_file_content(filepath, original, "json")
+
+    def save_history(self, content):
+        history = {
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "content": content,
+        }
+        self.save_file_json(self.history_file, history)

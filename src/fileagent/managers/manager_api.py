@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException
 import uvicorn
 import json
+import time
 
 
 class ManagerAPI:
@@ -101,7 +102,10 @@ class ManagerAPI:
             raise HTTPException(status_code=400, detail="Invalid JSON format")
 
         if file.content_type == "application/json":
+            # From managersnort
             self.append_rule(content_dict)
+            # From managerfile
+            self.save_history(content_dict)
             return {"message": "JSON file received", "content": content_str}
         else:
             raise HTTPException(status_code=400, detail="Unsupported file type")
