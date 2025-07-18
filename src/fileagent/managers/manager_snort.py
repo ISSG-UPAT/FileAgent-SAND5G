@@ -500,6 +500,25 @@ class ManagerSnort:
                 return True
             return False
 
+    def get_current_siv(self):
+        """
+        Description:
+            Get the current Snort ID Version (SIV) from the rules file.
+            This function reads the rules file and extracts the SIV from the first line.
+
+        Returns:
+            str: The current Snort ID Version (SIV).
+        """
+        # This is a first version 
+        # TO be added to the rule appendor 
+        
+        with open(self.rules_file, "r") as file:
+            first_line = file.readline().strip()
+            siv_match = re.search(r"^\s*#\s*SIV:\s*(\d+)", first_line)
+            return siv_match.group(1) if siv_match else None
+
+
+
 
 if __name__ == "__main__":
     snorty = ManagerSnort()
