@@ -517,7 +517,12 @@ class ManagerSnort:
         # This needs to change if we are going to go with the pretty building of the rule
 
         with open(self.rules_file, "r") as file:
-            rules = file.readlines()
+            rules = self.read_snort_rules(rules=file.readlines())
+            # For now this function can't accurately check if a snort rule is duplicate,
+            # because of the different sids
+
+            # rules = list(map(self.rule_splitter, rules))
+            # rule_obj = self.rule_splitter(rule)
             if any(rule in rule_line for rule_line in rules):
                 return True
             return False
@@ -532,33 +537,51 @@ class ManagerSnort:
         Returns:
             list[str]: List of rules from the rules file
         """
-        result = []
         with open(self.rules_file, "r") as file:
-            rules = file.readlines()
-            temp = []
-            multi_line = False
-            for rule in rules:
-                # Remove comments and strip whitespace
-                rule = rule.strip()
-                if rule.startswith("#"):
-                    continue
+            return self.read_snort_rules(rules=file.readlines())
 
-                # This will only get the rules that are one lined
-                if rule and rule.endswith(")") and rule != ")":
-                    result.append(rule)
+    def read_snort_rules(self, rules: list[str]) -> list[str]:
+        """
+        Processes a list of Snort rules and returns a list of valid rules.
 
-                # This is going to start handling the rule as if it is in multiple lines
-                elif rule and not rule.endswith(")") and rule != ")":
-                    temp.append(rule)
-                    multi_line = True
-                # If the rule is multi-line and ends with a closing parenthesis, we join the temp list
-                elif multi_line and rule.endswith(")"):
-                    temp.append(rule)
-                    result.append(" ".join(temp))
-                    temp = []
-                    multi_line = False
+        This method filters out comments, handles multi-line rules, and ensures
+        that only properly formatted rules are included in the result.
 
-            return result
+        Args:
+            rules (list[str]): A list of strings representing Snort rules.
+
+        Returns:
+            list[str]: A list of processed Snort rules. Single-line rules are
+            included directly, while multi-line rules are concatenated into
+            single strings.
+        """
+
+        # rules =
+        result = []
+        temp = []
+        multi_line = False
+        for rule in rules:
+            # Remove comments and strip whitespace
+            rule = rule.strip()
+            if rule.startswith("#"):
+                continue
+
+            # This will only get the rules that are one lined
+            if rule and rule.endswith(")") and rule != ")":
+                result.append(rule)
+
+            # This is going to start handling the rule as if it is in multiple lines
+            elif rule and not rule.endswith(")") and rule != ")":
+                temp.append(rule)
+                multi_line = True
+            # If the rule is multi-line and ends with a closing parenthesis, we join the temp list
+            elif multi_line and rule.endswith(")"):
+                temp.append(rule)
+                result.append(" ".join(temp))
+                temp = []
+                multi_line = False
+
+        return result
 
     def get_current_sid(self, start=10000, end=20000) -> int:
         """
