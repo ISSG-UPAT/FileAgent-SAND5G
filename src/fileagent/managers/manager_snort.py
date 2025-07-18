@@ -241,5 +241,6 @@ if __name__ == "__main__":
     domain = "training.testserver.gr"
     content = "74 72 61 69 6e 69 6e 67 2e 74 65 73 74 73 65 72 76 65 72 2e 67 72"
     snorty.building_rule_block_domain(domain, verbose=True)
+    snorty.building_rule_block(domain, verbose=True)
     snorty.building_rule_block_icmp("10.45.0.3", verbose=True)
     snorty.building_rule_alert_icmp("10.45.0.3", verbose=True)
