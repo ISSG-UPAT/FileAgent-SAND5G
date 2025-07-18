@@ -72,7 +72,7 @@ class ManagerSnort:
             rule = tranlator_book[command](data.get("target"))
         return rule
 
-    def building_rule_block(self, target: str, msg: str = None, verbose=False) -> str:
+    def building_rule_block1(self, target: str, msg: str = None, verbose=False) -> str:
         rule = ""
 
         rule += f"block "  # Start of the rule
@@ -86,6 +86,32 @@ class ManagerSnort:
         else:
             rule += f'msg:"Block traffic From IP {target}"; '
         rule += ")"
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_block(self, target: str, msg: str = None, verbose=False) -> str:
+        """
+        Builds a Snort rule to block HTTP traffic from a specific target.
+
+        Args:
+            target (str): The target IP address or domain.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        """
+        rule = self.build_snort_rule(
+            action="block",
+            protocol="http",
+            src_ip=target,
+            src_port="any",
+            direction="->",
+            dst_ip="$HOME_NET",
+            dst_port="any",
+            msg=msg or f"Block traffic From IP {target}",
+        )
         if verbose:
             print(rule)
         return rule
@@ -179,52 +205,91 @@ class ManagerSnort:
 
     def build_snort_rule(
         self,
-        # header fields
-        action: str = None,  # e.g. 'alert','drop','log','pass','block','react','reject','rewrite'
-        rule_type: str = None,  # 'traditional','service','file','file_id'
-        protocol: str = None,  # 'ip','icmp','tcp','udp' or service names
-        src_ip: str = None,  # Source IP address
-        src_port: int = None,  # Source port number
-        direction: str = None,  # '->','<>'
-        dst_ip: str = None,  # Destination IP address
-        dst_port: int = None,  # Destination port number
-        # general options
-        msg: str = None,  # Message string
-        reference: list[
-            tuple[str, str]
-        ] = None,  # List of tuples [('url','example.com'),...]
-        gid: int = None,  # Group ID
-        sid: int = None,  # Snort ID
-        rev: int = None,  # Revision number
-        classtype: str = None,  # Classification type
-        priority: int = None,  # Priority level
-        metadata: dict[str, str] = None,  # Metadata dictionary with key-value pairs
-        service_opt: list[str] = None,  # List of service options
-        rem: str = None,  # Remarks
-        file_meta: dict[
-            str, str
-        ] = None,  # File metadata dictionary with keys type, id, category, group, version
-        # payload options
-        content: list[
-            dict[str, str]
-        ] = None,  # List of dictionaries with payload options
-        pcre: list[str] = None,  # List of PCRE strings
-        regex: list[str] = None,  # List of regex strings
-        bufferlen: int = None,  # Buffer length
-        isdataat: bool = None,  # Boolean indicating if data is at a specific location
-        dsize: int = None,  # Data size
-        # non-payload and post-detect (examples)
-        flow: list[str] = None,  # List of flow options
-        ttl: int = None,  # Time-to-live value
-        ipopts: list[str] = None,  # List of IP options
-        fragoffset: int = None,  # Fragment offset
-        fragbits: str = None,  # Fragment bits
-        priority_bit: str = None,  # Priority bit
-        dce: str = None,  # DCE/RPC options
-        ssl_state: str = None,  # SSL state options
-        # other options as needed
-    ):
-        """Build a Snort rule string from provided parameters."""
+        action: str = None,
+        rule_type: str = None,
+        protocol: str = None,
+        src_ip: str = None,
+        src_port: int = None,
+        direction: str = None,
+        dst_ip: str = None,
+        dst_port: int = None,
+        msg: str = None,
+        reference: list[tuple[str, str]] = None,
+        gid: int = None,
+        sid: int = None,
+        rev: int = None,
+        classtype: str = None,
+        priority: int = None,
+        metadata: dict[str, str] = None,
+        service_opt: list[str] = None,
+        rem: str = None,
+        file_meta: dict[str, str] = None,
+        content: list[dict[str, str]] = None,
+        pcre: list[str] = None,
+        regex: list[str] = None,
+        bufferlen: int = None,
+        isdataat: bool = None,
+        dsize: int = None,
+        flow: list[str] = None,
+        ttl: int = None,
+        ipopts: list[str] = None,
+        fragoffset: int = None,
+        fragbits: str = None,
+        priority_bit: str = None,
+        dce: str = None,
+        ssl_state: str = None,
+        pretty: bool = False,
+        verbose: bool = False,
+    ) -> str:
+        """
+        Description:
+            Builds a Snort rule string based on the provided parameters.
+
+            This function constructs a Snort rule by combining header fields, general options,
+            payload options, and non-payload options. It validates required fields and formats
+            the rule according to Snort syntax.
+
+        Args:
+            action (str): The action to take (e.g., 'alert', 'drop', 'log', etc.).
+            rule_type (str): The type of rule ('traditional', 'service', 'file', 'file_id').
+            protocol (str): The protocol to match ('ip', 'icmp', 'tcp', 'udp').
+            src_ip (str): The source IP address.
+            src_port (int): The source port number.
+            direction (str): The direction of traffic ('->', '<>').
+            dst_ip (str): The destination IP address.
+            dst_port (int): The destination port number.
+            msg (str): The message string for the rule.
+            reference (list[tuple[str, str]]): List of references as tuples (scheme, id).
+            gid (int): Group ID for the rule.
+            sid (int): Snort ID for the rule.
+            rev (int): Revision number for the rule.
+            classtype (str): Classification type for the rule.
+            priority (int): Priority level for the rule.
+            metadata (dict[str, str]): Metadata key-value pairs.
+            service_opt (list[str]): List of service options.
+            rem (str): Remarks for the rule.
+            file_meta (dict[str, str]): File metadata with keys like type, id, category, etc.
+            content (list[dict[str, str]]): Payload content options.
+            pcre (list[str]): List of PCRE strings.
+            regex (list[str]): List of regex strings.
+            bufferlen (int): Buffer length for payload matching.
+            isdataat (bool): Indicates if data is at a specific location.
+            dsize (int): Data size for payload matching.
+            flow (list[str]): List of flow options.
+            ttl (int): Time-to-live value.
+            ipopts (list[str]): List of IP options.
+            fragoffset (int): Fragment offset value.
+            fragbits (str): Fragment bits value.
+            priority_bit (str): Priority bit value.
+            dce (str): DCE/RPC options.
+            ssl_state (str): SSL state options.
+            pretty (bool): If True, formats the rule for readability.
+            verbose (bool): If True, prints the rule to the console.
+
+        Returns:
+            str: The formatted Snort rule string.
+        """
+
         # build header
         parts = []
         if action in (
@@ -241,11 +306,9 @@ class ManagerSnort:
 
         # service/file/file_id rules only need action and keyword
         if rule_type in ("service", "file", "file_id"):
-            if rule_type == "traditional":
-                pass
-            else:
-                parts.append(rule_type)
+            parts.append(rule_type)
         else:
+            # Else it is considered traditional
             for x in (protocol, src_ip, src_port):
                 if not x:
                     raise ValueError("protocol, src_ip, src_port required")
@@ -262,6 +325,16 @@ class ManagerSnort:
         opts = []
 
         def opt(name, val):
+            """
+            Description:
+                Helper function to append options to the opts list.
+                If val is a list, it appends each value with the name.
+                If val is not None, it appends the name and value.
+
+            Args:
+                name (str): The name of the option.
+                val (any): The value of the option, can be a list or a single value.
+            """
             if isinstance(val, list):
                 for v in val:
                     opts.append(f"{name}:{v};")
@@ -272,21 +345,32 @@ class ManagerSnort:
         if msg:
             opts.append(f"msg:'{msg}';")
         if reference:
+            # reference is a list of tuples (scheme, id)
+            # e.g. [('url', 'example.com'), ('cve', 'CVE-2023-1234')]
+            if not isinstance(reference, list):
+                raise ValueError("reference must be a list of tuples")
             for scheme, rid in reference:
                 opts.append(f"reference:{scheme},{rid};")
+
         opt("gid", gid)
         opt("sid", sid)
         opt("rev", rev)
+
         if classtype:
             opts.append(f"classtype:{classtype};")
+
         opt("priority", priority)
+
         if metadata:
             pairs = [f"{k} {v}" for k, v in metadata.items()]
             opts.append(f"metadata:{','.join(pairs)};")
+
         if service_opt:
             opts.append(f"service:{','.join(service_opt)};")
+
         if rem:
             opts.append(f"rem:'{rem}';")
+
         if file_meta:
             fm = file_meta
             parts = [f"type {fm['type']}", f"id {fm['id']}"]
@@ -294,6 +378,7 @@ class ManagerSnort:
                 if fm.get(k):
                     parts.append(f"{k} '{fm[k]}'")
             opts.append(f"file_meta:{','.join(parts)};")
+
         # payload opts example
         if content:
             for c in content:
@@ -314,19 +399,30 @@ class ManagerSnort:
                     elif v not in (None, False):
                         segs.append(f"{m} {v}")
                 opts.append(f"{','.join(segs)};")
+
         # pcre, regex examples
         if pcre:
             for r in pcre:
                 opts.append(f"pcre:'{r}';")
+
         if regex:
             for r in regex:
                 opts.append(f"regex:'{r}';")
+
         # non-payload example
         if flow:
             opts.append(f"flow:{','.join(flow)};")
+
+        if verbose:
+            print("Nothing to verbose. For now ")
+
         # compile rule
-        body = "\n    ".join(opts)
-        return f"{header} (\n    {body}\n)"
+        if pretty:
+            body = "\n    ".join(opts)
+            return f"{header} (\n    {body}\n)"
+        else:
+            body = " ".join(opts)
+            return f"{header} ({body})"
 
         #
 
@@ -382,6 +478,8 @@ class ManagerSnort:
             bool: True if the rule exists, False otherwise
         """
 
+        # This needs to change if we are going to go with the pretty building of the rule
+
         with open(self.rules_file, "r") as file:
             rules = file.readlines()
             if any(rule in rule_line for rule_line in rules):
@@ -393,7 +491,7 @@ if __name__ == "__main__":
     snorty = ManagerSnort()
     domain = "training.testserver.gr"
     content = "74 72 61 69 6e 69 6e 67 2e 74 65 73 74 73 65 72 76 65 72 2e 67 72"
-    snorty.building_rule_block_domain(domain, verbose=True)
+    # snorty.building_rule_block_domain(domain, verbose=True)
     snorty.building_rule_block(domain, verbose=True)
-    snorty.building_rule_block_icmp("10.45.0.3", verbose=True)
-    snorty.building_rule_alert_icmp("10.45.0.3", verbose=True)
+    # snorty.building_rule_block_icmp("10.45.0.3", verbose=True)
+    # snorty.building_rule_alert_icmp("10.45.0.3", verbose=True)
