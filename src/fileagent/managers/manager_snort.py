@@ -84,7 +84,7 @@ class ManagerSnort:
         Returns:
             str: The formatted Snort rule string.
         """
-        rule = self.builder(
+        parts, opts = self.builder(
             action="block",
             protocol="http",
             src_ip=target,
@@ -92,8 +92,11 @@ class ManagerSnort:
             direction="->",
             dst_ip="$HOME_NET",
             dst_port="any",
+            sid=self.get_current_sid(),
             msg=msg or f"Block traffic From IP {target}",
         )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
         if verbose:
             print(rule)
         return rule
@@ -112,7 +115,7 @@ class ManagerSnort:
         Returns:
             str: The formatted Snort rule string.
         """
-        rule = self.builder(
+        parts, opts = self.builder(
             action="block",
             protocol="icmp",
             src_ip=target,
@@ -120,8 +123,11 @@ class ManagerSnort:
             direction="->",
             dst_ip="$HOME_NET",
             dst_port="any",
+            sid=self.get_current_sid(),
             msg=msg or f"Block ICMP From IP {target}",
         )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
         if verbose:
             print(rule)
         return rule
@@ -140,7 +146,7 @@ class ManagerSnort:
         Returns:
             str: The formatted Snort rule string.
         """
-        rule = self.builder(
+        parts, opts = self.builder(
             action="alert",
             protocol="icmp",
             src_ip=target,
@@ -148,8 +154,12 @@ class ManagerSnort:
             direction="->",
             dst_ip="$HOME_NET",
             dst_port="any",
+            sid=self.get_current_sid(),
             msg=msg or f"Alert ICMP From IP {target}",
         )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+
         if verbose:
             print(rule)
         return rule
@@ -168,7 +178,8 @@ class ManagerSnort:
         Returns:
             str: The formatted Snort rule string.
         """
-        rule = self.builder(
+
+        parts, opts = self.builder(
             action="block",
             protocol="ssl",
             src_ip="any",
@@ -176,9 +187,13 @@ class ManagerSnort:
             direction="->",
             dst_ip="$HOME_NET",
             dst_port=443,
+            sid=self.get_current_sid(),
             msg=msg or f"Block domain {domain}",
             content=[{"value": self.to_hex(domain)}],
         )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+
         if verbose:
             print(rule)
         return rule
@@ -195,7 +210,7 @@ class ManagerSnort:
         Returns:
             str: The formatted Snort rule string.
         """
-        rule = self.builder(
+        parts, opts = self.builder(
             action="alert",
             protocol="ip",
             src_ip=target,
@@ -209,8 +224,11 @@ class ManagerSnort:
             rev=1,
             reference=[("url", "https://misp.gsma.com/events/view/19270")],
         )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
         if verbose:
             print(rule)
+
         return rule
 
     def builder(
@@ -248,9 +266,8 @@ class ManagerSnort:
         priority_bit: str = None,
         dce: str = None,
         ssl_state: str = None,
-        pretty: bool = False,
         verbose: bool = False,
-    ) -> str:
+    ) -> list[list[str]]:
         """
         Description:
             Builds a Snort rule string based on the provided parameters.
@@ -297,7 +314,7 @@ class ManagerSnort:
             verbose (bool): If True, prints the rule to the console.
 
         Returns:
-            str: The formatted Snort rule string.
+            list[list[str]]: A list containing the parts and options of the snort rule.
         """
 
         # build header
@@ -332,8 +349,6 @@ class ManagerSnort:
                 if not x:
                     raise ValueError("dst_ip,dst_port required")
                 parts.append(x)
-
-        header = " ".join(parts)
 
         # build options
         opts = []
@@ -429,6 +444,15 @@ class ManagerSnort:
 
         if verbose:
             print("Nothing to verbose. For now ")
+        return parts, opts
+
+    def build_formatter(
+        self, parts: list[str], opts: list[str], pretty: bool = False
+    ) -> str:
+        print(parts)
+        header = " ".join(
+            list(map(lambda x: x if isinstance(x, str) else str(x), parts))
+        )
 
         # compile rule
         if pretty:
@@ -437,8 +461,6 @@ class ManagerSnort:
         else:
             body = " ".join(opts)
             return f"{header} ({body})"
-
-        #
 
     def to_hex(self, domain: str) -> str:
         """
@@ -500,24 +522,107 @@ class ManagerSnort:
                 return True
             return False
 
-    def get_current_siv(self):
+    def get_rules_from_file(self) -> list[str]:
         """
         Description:
-            Get the current Snort ID Version (SIV) from the rules file.
-            This function reads the rules file and extracts the SIV from the first line.
+            Get the rules from the rules file
+            This function reads the rules file and returns a list of rules.
+            It removes comments and empty lines from the rules.
 
         Returns:
-            str: The current Snort ID Version (SIV).
+            list[str]: List of rules from the rules file
         """
-        # This is a first version 
-        # TO be added to the rule appendor 
-        
+        result = []
         with open(self.rules_file, "r") as file:
-            first_line = file.readline().strip()
-            siv_match = re.search(r"^\s*#\s*SIV:\s*(\d+)", first_line)
-            return siv_match.group(1) if siv_match else None
+            rules = file.readlines()
+            temp = []
+            multi_line = False
+            for rule in rules:
+                # Remove comments and strip whitespace
+                rule = rule.strip()
+                if rule.startswith("#"):
+                    continue
 
+                # This will only get the rules that are one lined
+                if rule and rule.endswith(")") and rule != ")":
+                    result.append(rule)
 
+                # This is going to start handling the rule as if it is in multiple lines
+                elif rule and not rule.endswith(")") and rule != ")":
+                    temp.append(rule)
+                    multi_line = True
+                # If the rule is multi-line and ends with a closing parenthesis, we join the temp list
+                elif multi_line and rule.endswith(")"):
+                    temp.append(rule)
+                    result.append(" ".join(temp))
+                    temp = []
+                    multi_line = False
+
+            return result
+
+    def get_current_sid(self, start=10000, end=20000) -> int:
+        """
+        Description:
+            Get the current Snort ID Version (sid) from the rules file.
+            This function reads the rules file and extracts the sid from the first line.
+
+        Returns:
+            str: The current Snort ID Version (sid).
+        """
+        # Get all the rules
+
+        rules = list(map(self.rule_splitter, self.get_rules_from_file()))
+        # Get all the sids from the rules
+        sids = list(map(lambda x: x.get("options", {}).get("sid"), rules))
+
+        # Filter the sids to get the ones in the range
+        filtered_sids = [int(sid) for sid in sids if start <= int(sid) <= end]
+        current_sid = max(filtered_sids) + 1 if filtered_sids else start
+        return current_sid
+
+    def rule_splitter(self, rule: str) -> dict:
+        """
+        Description:
+            Parses a Snort rule string and extracts its configurations into a dictionary.
+
+        Args:
+            rule (str): The Snort rule string to be parsed.
+
+        Returns:
+            dict: A dictionary containing the parsed configurations of the rule.
+        """
+        # Initialize the result dictionary
+        parsed_rule = {}
+
+        # Split the rule into header and options
+        header, options = rule.split("(", 1)
+        options = options.rstrip(")")
+
+        # Parse the header
+        header_parts = header.strip().split()
+        if len(header_parts) >= 6:
+            parsed_rule["action"] = header_parts[0]
+            parsed_rule["protocol"] = header_parts[1]
+            parsed_rule["src_ip"] = header_parts[2]
+            parsed_rule["src_port"] = header_parts[3]
+            parsed_rule["direction"] = header_parts[4]
+            parsed_rule["dst_ip"] = header_parts[5]
+            parsed_rule["dst_port"] = (
+                header_parts[6] if len(header_parts) > 6 else "any"
+            )
+
+        # Parse the options
+        options_dict = {}
+        for option in options.split(";"):
+            if ":" in option:
+                key, value = option.split(":", 1)
+                options_dict[key.strip()] = value.strip()
+            elif option.strip():
+                options_dict[option.strip()] = True
+
+        parsed_rule["options"] = options_dict
+
+        return parsed_rule
 
 
 if __name__ == "__main__":
@@ -526,5 +631,6 @@ if __name__ == "__main__":
     content = "74 72 61 69 6e 69 6e 67 2e 74 65 73 74 73 65 72 76 65 72 2e 67 72"
     # snorty.building_rule_block_domain(domain, verbose=True)
     snorty.building_rule_block(domain, verbose=True)
+    # print(snorty.get_rules_from_file())
     # snorty.building_rule_block_icmp("10.45.0.3", verbose=True)
     # snorty.building_rule_alert_icmp("10.45.0.3", verbose=True)
