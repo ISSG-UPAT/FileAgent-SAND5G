@@ -72,24 +72,6 @@ class ManagerSnort:
             rule = tranlator_book[command](data.get("target"))
         return rule
 
-    def building_rule_block1(self, target: str, msg: str = None, verbose=False) -> str:
-        rule = ""
-
-        rule += f"block "  # Start of the rule
-        rule += f"http "
-        rule += f"{target} "
-        rule += "any -> $HOME_NET any "  # Direction of the alert
-        rule += "("
-
-        if msg:
-            rule += f'msg:"{msg}"; '  # Message of the alert
-        else:
-            rule += f'msg:"Block traffic From IP {target}"; '
-        rule += ")"
-        if verbose:
-            print(rule)
-        return rule
-
     def building_rule_block(self, target: str, msg: str = None, verbose=False) -> str:
         """
         Builds a Snort rule to block HTTP traffic from a specific target.
@@ -102,7 +84,7 @@ class ManagerSnort:
         Returns:
             str: The formatted Snort rule string.
         """
-        rule = self.build_snort_rule(
+        rule = self.builder(
             action="block",
             protocol="http",
             src_ip=target,
@@ -119,19 +101,27 @@ class ManagerSnort:
     def building_rule_block_icmp(
         self, target: str, msg: str = None, verbose=False
     ) -> str:
-        rule = ""
+        """
+        Builds a Snort rule to block ICMP traffic from a specific target.
 
-        rule += f"block "  # Start of the rule
-        rule += f"icmp "
-        rule += f"{target} "
-        rule += "any -> $HOME_NET any "  # Direction of the alert
-        rule += "("
+        Args:
+            target (str): The target IP address.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
 
-        if msg:
-            rule += f'msg:"{msg}"; '  # Message of the alert
-        else:
-            rule += f'msg:"Block icmp From IP {target}"; '
-        rule += ")"
+        Returns:
+            str: The formatted Snort rule string.
+        """
+        rule = self.builder(
+            action="block",
+            protocol="icmp",
+            src_ip=target,
+            src_port="any",
+            direction="->",
+            dst_ip="$HOME_NET",
+            dst_port="any",
+            msg=msg or f"Block ICMP From IP {target}",
+        )
         if verbose:
             print(rule)
         return rule
@@ -139,19 +129,27 @@ class ManagerSnort:
     def building_rule_alert_icmp(
         self, target: str, msg: str = None, verbose=False
     ) -> str:
-        rule = ""
+        """
+        Builds a Snort rule to alert on ICMP traffic from a specific target.
 
-        rule += f"alert "  # Start of the rule
-        rule += f"icmp "
-        rule += f"{target} "
-        rule += "any -> $HOME_NET any "  # Direction of the alert
-        rule += "("
+        Args:
+            target (str): The target IP address.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
 
-        if msg:
-            rule += f'msg:"{msg}"; '  # Message of the alert
-        else:
-            rule += f'msg:"Alert icmp From IP {target}"; '
-        rule += ")"
+        Returns:
+            str: The formatted Snort rule string.
+        """
+        rule = self.builder(
+            action="alert",
+            protocol="icmp",
+            src_ip=target,
+            src_port="any",
+            direction="->",
+            dst_ip="$HOME_NET",
+            dst_port="any",
+            msg=msg or f"Alert ICMP From IP {target}",
+        )
         if verbose:
             print(rule)
         return rule
@@ -159,51 +157,63 @@ class ManagerSnort:
     def building_rule_block_domain(
         self, domain: str, msg: str = None, verbose=False
     ) -> str:
-        rule = ""
-        rule += f"block "  # Start of the rule
-        rule += "ssl "  # Protocol of the rule
-        rule += "any "  # IP address of the rule
-        rule += "any "  # Port of the rule
-        rule += "-> "  # Direction of the rule
-        rule += "$HOME_NET 443 "  # Direction of the alert
-        rule += "("
+        """
+        Builds a Snort rule to block traffic to a specific domain.
 
-        if msg:
-            rule += f'msg:"{msg}"; '  # Message of the alert
-        else:
-            rule += f'msg:"Block domain {domain}"; '
-        rule += f'content:"|{self.to_hex(domain)}|"  ;'  # Content of the alert
-        rule += ")"
+        Args:
+            domain (str): The target domain to block.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
 
+        Returns:
+            str: The formatted Snort rule string.
+        """
+        rule = self.builder(
+            action="block",
+            protocol="ssl",
+            src_ip="any",
+            src_port="any",
+            direction="->",
+            dst_ip="$HOME_NET",
+            dst_port=443,
+            msg=msg or f"Block domain {domain}",
+            content=[{"value": self.to_hex(domain)}],
+        )
         if verbose:
             print(rule)
         return rule
 
     def building_rule_alert(self, target: str, msg: str = None, verbose=False) -> str:
-        rule = ""
+        """
+        Builds a Snort rule to alert on IP traffic from a specific target.
 
-        rule += f"alert "  # Start of the rule
-        rule += "ip "
-        rule += f"{target} "
-        rule += "any -> $HOME_NET any "  # Direction of the alert
-        rule += "("
+        Args:
+            target (str): The target IP address.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
 
-        if msg:
-            rule += f'msg:"{msg}"; '  # Message of the alert
-        else:
-            rule += f'msg:"IP Alert Incoming From IP {target}"; '
-
-        rule += "classtype:tcp-connection; "  # Class type of the alert
-        rule += "sid:28154103; "  # Snort ID of the alert
-        rule += "rev:1; "  # Revision of the alert
-        rule += "reference:url,https://misp.gsma.com/events/view/19270; "  # Reference of the alert
-        rule += ")"
-
+        Returns:
+            str: The formatted Snort rule string.
+        """
+        rule = self.builder(
+            action="alert",
+            protocol="ip",
+            src_ip=target,
+            src_port="any",
+            direction="->",
+            dst_ip="$HOME_NET",
+            dst_port="any",
+            msg=msg or f"IP Alert Incoming From IP {target}",
+            classtype="tcp-connection",
+            sid=28154103,
+            rev=1,
+            reference=[("url", "https://misp.gsma.com/events/view/19270")],
+        )
         if verbose:
             print(rule)
         return rule
 
-    def build_snort_rule(
+    def builder(
         self,
         action: str = None,
         rule_type: str = None,
@@ -313,6 +323,10 @@ class ManagerSnort:
                 if not x:
                     raise ValueError("protocol, src_ip, src_port required")
                 parts.append(x)
+
+            # if direction in ("->", "<>", None):
+            #     parts.append(direction or "->")
+
             parts.append(direction or "->")
             for x in (dst_ip, dst_port):
                 if not x:
