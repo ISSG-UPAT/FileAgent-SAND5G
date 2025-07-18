@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fileagent"
-version = "0.2.0" 
+version = "0.2.1" 
 description = "Python fileagent to accompany Snort in a container"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -35,7 +35,7 @@ docs = ["pdoc3>=0.11.4"]
 Homepage = "https://github.com/ISSG-UPAT/FileAgent-SAND5G"
 
 [tool.setuptools]
-packages = ["fileagent"]
+packages = ["fileagent", "fileagent.managers"]
 package-dir = {"" = "src"}
 
 
