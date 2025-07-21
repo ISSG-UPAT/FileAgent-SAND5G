@@ -53,16 +53,16 @@ class ManagerAPI:
 
             return await self.upload_functionality(file)
 
-        @self.app.get("/dashboard")
-        async def dashboard():
+        @self.app.get("/notifications")
+        async def notifications():
             """
             Description:
-                Endpoint to retrieve the dashboard data.
+                Endpoint to retrieve the notifications data.
                 This is a placeholder function that can be expanded to return
-                actual dashboard data in the future.
+                actual notifications data in the future.
 
             Returns:
-                dict: A simple message indicating the dashboard is ready.
+                dict: A simple message indicating the notifications is ready.
             """
             # function from manager_files.py
 
@@ -73,7 +73,7 @@ class ManagerAPI:
             history = notifications.get("history")
 
             return {
-                "message": "Dashboard is ready",
+                "message": "notifications is ready",
                 "latest": history[-1] if history else None,
                 "timestamp": time.time(),
                 "notifications": history[1:] if len(history) > 1 else [],
