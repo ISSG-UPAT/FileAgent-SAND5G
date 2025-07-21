@@ -86,11 +86,11 @@ class ManagerSnort:
         """
         parts, opts = self.builder(
             action="block",
-            protocol="http",
+            protocol="ip",
             src_ip=target,
             src_port="any",
             direction="->",
-            dst_ip="$HOME_NET",
+            dst_ip="any",
             dst_port="any",
             sid=self.get_current_sid(),
             msg=msg or f"Block traffic From IP {target}",
@@ -121,7 +121,7 @@ class ManagerSnort:
             src_ip=target,
             src_port="any",
             direction="->",
-            dst_ip="$HOME_NET",
+            dst_ip="any",
             dst_port="any",
             sid=self.get_current_sid(),
             msg=msg or f"Block ICMP From IP {target}",
@@ -152,7 +152,7 @@ class ManagerSnort:
             src_ip=target,
             src_port="any",
             direction="->",
-            dst_ip="$HOME_NET",
+            dst_ip="any",
             dst_port="any",
             sid=self.get_current_sid(),
             msg=msg or f"Alert ICMP From IP {target}",
@@ -185,10 +185,11 @@ class ManagerSnort:
             src_ip="any",
             src_port="any",
             direction="->",
-            dst_ip="$HOME_NET",
+            dst_ip="any",
             dst_port=443,
             sid=self.get_current_sid(),
-            msg=msg or f"Block domain {domain}",
+            ssl_state="client_hello",
+            msg=msg or f"Block domain with SNI {domain}",
             content=[{"value": f"|{self.to_hex(domain)}|"}],
         )
 
@@ -216,13 +217,12 @@ class ManagerSnort:
             src_ip=target,
             src_port="any",
             direction="->",
-            dst_ip="$HOME_NET",
+            dst_ip="any",
             dst_port="any",
             msg=msg or f"IP Alert Incoming From IP {target}",
             classtype="tcp-connection",
-            sid=28154103,
+            sid=self.get_current_sid(),
             rev=1,
-            reference=[("url", "https://misp.gsma.com/events/view/19270")],
         )
 
         rule = self.build_formatter(parts, opts, pretty=True)
