@@ -189,7 +189,7 @@ class ManagerSnort:
             dst_port=443,
             sid=self.get_current_sid(),
             msg=msg or f"Block domain {domain}",
-            content=[{"value": self.to_hex(domain)}],
+            content=[{"value": f"|{self.to_hex(domain)}|"}],
         )
 
         rule = self.build_formatter(parts, opts, pretty=True)
@@ -366,13 +366,13 @@ class ManagerSnort:
             """
             if isinstance(val, list):
                 for v in val:
-                    opts.append(f"{name}:{v};")
+                    opts.append(f"{name}: {v};")
             elif val is not None:
-                opts.append(f"{name}:{val};")
+                opts.append(f"{name}: {val};")
 
         # general opts
         if msg:
-            opts.append(f"msg:'{msg}';")
+            opts.append(f'msg:"{msg}";')
         if reference:
             # reference is a list of tuples (scheme, id)
             # e.g. [('url', 'example.com'), ('cve', 'CVE-2023-1234')]
@@ -411,7 +411,7 @@ class ManagerSnort:
         # payload opts example
         if content:
             for c in content:
-                segs = [f"content:'{c['value']}'"]
+                segs = [f'content:"{c['value']}"']
                 for m in (
                     "fast_pattern",
                     "nocase",
@@ -449,7 +449,7 @@ class ManagerSnort:
     def build_formatter(
         self, parts: list[str], opts: list[str], pretty: bool = False
     ) -> str:
-        print(parts)
+        # print(parts)
         header = " ".join(
             list(map(lambda x: x if isinstance(x, str) else str(x), parts))
         )
@@ -651,6 +651,7 @@ class ManagerSnort:
 if __name__ == "__main__":
     snorty = ManagerSnort()
     domain = "training.testserver.gr"
+    domain = "forbidden.url"
     content = "74 72 61 69 6e 69 6e 67 2e 74 65 73 74 73 65 72 76 65 72 2e 67 72"
     # snorty.building_rule_block_domain(domain, verbose=True)
     snorty.building_rule_block(domain, verbose=True)
