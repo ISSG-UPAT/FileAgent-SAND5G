@@ -384,7 +384,7 @@ class ManagerSnort:
         opt("gid", gid)
         opt("sid", sid)
         opt("rev", rev)
-
+        opt("ssl_state", ssl_state)
         if classtype:
             opts.append(f"classtype:{classtype};")
 
