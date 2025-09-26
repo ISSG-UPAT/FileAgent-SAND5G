@@ -42,21 +42,113 @@ class ManagerAPI:
             _type_: _description_
         """
 
-        @self.app.post("/upload")
-        async def upload_json(payload: Dict[str, Any] = Body(...)):
+        @self.app.post(
+            "/upload",
+            summary="Upload JSON payload and translate to Snort rule",
+            description=(
+                "Accept a JSON payload which will be translated to a Snort rule by "
+                "manager_snort.rule_translator. The endpoint runs the translation/append "
+                "pipeline: rule_translator -> duplicate check (rule_exists) -> append_rule -> save_history.\n\n"
+                "The rule_translator implementation determines accepted JSON shapes. Common examples:\n"
+                ' - Simple content wrapper: {"content": {"ip": "192.168.1.1"}}\n'
+                ' - Explicit fields: {"command": "block", "target": "192.168.1.1"}\n'
+                ' - Full rule string (if translator accepts it): {"rule": "alert ip 1.2.3.4 ..."}\n\n'
+                "The translator must return a rule string on success; otherwise the request is rejected."
+            ),
+            responses={
+                200: {"description": "Rule processed successfully"},
+                400: {
+                    "description": "Bad request — invalid or empty JSON payload or translation failed"
+                },
+                409: {"description": "Duplicate rule — rule already exists"},
+                500: {"description": "Internal server error while processing rule"},
+            },
+        )
+        async def upload_json(
+            payload: Dict[str, Any] = Body(
+                ...,
+                examples={
+                    "alert_ip_sample": {
+                        "summary": "Alert on IP (matches tests/manual/alert_ip.json)",
+                        "value": {
+                            "file": "sample",
+                            "command": "alert_ip",
+                            "target": "10.1.39.20",
+                        },
+                    },
+                    "block_ip_sample": {
+                        "summary": "Block an IP (matches tests/manual/block_ip.json)",
+                        "value": {
+                            "file": "sample",
+                            "command": "block_ip",
+                            "target": "10.1.39.20",
+                        },
+                    },
+                    "block_domain_sample": {
+                        "summary": "Block a domain (matches tests/manual/block_domain.json)",
+                        "value": {
+                            "file": "Block Domain",
+                            "command": "block_domain",
+                            "target": "forbidden.site",
+                        },
+                    },
+                },
+            ),
+        ):
             """
             Accept a JSON body (application/json) in `payload`.
-            """
 
+            Validation and processing notes:
+            - The payload must be non-empty JSON.
+            - manager_snort.rule_translator(payload) is expected to produce a Snort rule string.
+            - If translation fails (translator returns None or empty), a 400 response is appropriate.
+            - If a duplicate is detected via manager_snort.rule_exists(rule) a 409 is appropriate.
+            - On success the rule is appended (append_rule) and the payload is recorded (save_history).
+            """
             if not payload:
                 raise HTTPException(status_code=400, detail="Empty JSON payload")
 
-            content_dict = payload
-            # from managersnort
-            self.append_rule(content_dict)
-            # from managerfile
-            self.save_history(content_dict)
-            return {"message": "JSON payload received", "content": content_dict}
+            # Attempt translation if available
+            rule = None
+            try:
+                if hasattr(self, "rule_translator"):
+                    rule = self.rule_translator(payload)
+            except Exception as exc:
+                raise HTTPException(status_code=400, detail=f"Translation error: {exc}")
+
+            if not rule:
+                # translation failed or returned nothing; inform the client
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "Translation failed or returned no rule. Ensure payload matches "
+                        "the manager_snort.rule_translator expected schema (command/target or content)."
+                    ),
+                )
+
+            # duplicate check
+            try:
+                if hasattr(self, "rule_exists") and self.rule_exists(rule):
+                    raise HTTPException(status_code=409, detail="Duplicate rule")
+            except HTTPException:
+                raise
+            except Exception:
+                # If duplicate check fails for any reason, continue cautiously
+                pass
+
+            # Append and save
+            try:
+                if hasattr(self, "append_rule"):
+                    # append_rule expects the original payload in current code
+                    self.append_rule(payload)
+                if hasattr(self, "save_history"):
+                    self.save_history(payload)
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=500, detail=f"Failed to persist rule: {exc}"
+                )
+
+            return {"message": "JSON payload received and processed", "rule": rule}
 
         @self.app.get("/notifications")
         async def notifications():
