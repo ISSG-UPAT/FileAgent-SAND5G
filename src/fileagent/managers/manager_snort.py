@@ -63,6 +63,7 @@ class ManagerSnort:
             "block_ip": self.building_rule_block,
             "block_domain": self.building_rule_block_domain,
             "alert_ip": self.building_rule_alert,
+            "alert_domain": self.building_rule_alert_domain,
             "block_icmp": self.building_rule_block_icmp,
         }
 
@@ -190,6 +191,41 @@ class ManagerSnort:
             sid=self.get_current_sid(),
             ssl_state="client_hello",
             msg=msg or f"Block domain with SNI {domain}",
+            content=[{"value": f"|{self.to_hex(domain)}|"}],
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_alert_domain(
+        self, domain: str, msg: str = None, verbose=False
+    ) -> str:
+        """
+        Builds a Snort rule to alert traffic to a specific domain.
+
+        Args:
+            domain (str): The target domain to alert.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        """
+
+        parts, opts = self.builder(
+            action="alert",
+            protocol="ssl",
+            src_ip="any",
+            src_port="any",
+            direction="->",
+            dst_ip="any",
+            dst_port=443,
+            sid=self.get_current_sid(),
+            ssl_state="client_hello",
+            msg=msg or f"alert domain with SNI {domain}",
             content=[{"value": f"|{self.to_hex(domain)}|"}],
         )
 
