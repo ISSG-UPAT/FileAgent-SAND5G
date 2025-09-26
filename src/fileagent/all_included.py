@@ -138,7 +138,7 @@ class FileAgent:
         """
 
         @self.app.post("/upload")
-        async def upload_file(file: UploadFile = File(...)):
+        async def upload_json(file: UploadFile = File(...)):
             if not file:
                 raise HTTPException(
                     status_code=400, detail="No file part in the request"

@@ -1,4 +1,5 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, HTTPException, Body
+from typing import Dict, Any
 import uvicorn
 import json
 import time
@@ -42,16 +43,20 @@ class ManagerAPI:
         """
 
         @self.app.post("/upload")
-        async def upload_file(file: UploadFile = File(...)):
-            if not file:
-                raise HTTPException(
-                    status_code=400, detail="No file part in the request"
-                )
+        async def upload_json(payload: Dict[str, Any] = Body(...)):
+            """
+            Accept a JSON body (application/json) in `payload`.
+            """
 
-            if file.filename == "":
-                raise HTTPException(status_code=400, detail="No file selected")
+            if not payload:
+                raise HTTPException(status_code=400, detail="Empty JSON payload")
 
-            return await self.upload_functionality(file)
+            content_dict = payload
+            # from managersnort
+            self.append_rule(content_dict)
+            # from managerfile
+            self.save_history(content_dict)
+            return {"message": "JSON payload received", "content": content_dict}
 
         @self.app.get("/notifications")
         async def notifications():
@@ -79,40 +84,7 @@ class ManagerAPI:
                 "notifications": history[1:] if len(history) > 1 else [],
             }
 
-    async def upload_functionality(self, file: UploadFile):
-        """
-        Description:
-            Handle the file upload functionality
-            This function reads the content of the uploaded file and appends it to the rules file.
-            It checks the content type of the file and processes it accordingly.
-            If the content type is not supported, it raises an HTTPException.
-
-        Args:
-            file (UploadFile): The uploaded file to be processed
-
-        Raises:
-            HTTPException: If the file type is unsupported
-
-        Returns:
-            dict: A message indicating the file has been received and its content
-        """
-
-        content = await file.read()
-        content_str = content.decode("utf-8")
-        content_dict = {}
-        try:
-            content_dict = json.loads(content_str)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail="Invalid JSON format")
-
-        if file.content_type == "application/json":
-            # From managersnort
-            self.append_rule(content_dict)
-            # From managerfile
-            self.save_history(content_dict)
-            return {"message": "JSON file received", "content": content_str}
-        else:
-            raise HTTPException(status_code=400, detail="Unsupported file type")
+    # Note: file upload handling removed; /upload accepts JSON payloads only.
 
     def run_uvicorn(self):
         """
