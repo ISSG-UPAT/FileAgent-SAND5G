@@ -1,4 +1,6 @@
 import requests
+import json
+import argparse
 from pathlib import Path
 
 
@@ -7,26 +9,29 @@ class AgentTester:
         self.path = Path(__file__).parent
         self.port = 8000
 
-    def send(self, url, file_path):
+    def send_json(self, url, file_path):
         # Ensure the file exists before attempting to send
         if not file_path.exists():
             print(f"Error: File not found - {file_path}")
             return
 
-        with open(file_path, "rb") as file:
-            files = {
-                "file": (
-                    file_path.name,
-                    file,
-                    "application/json",
-                )  # Use file_path.name as a string
-            }
+        try:
+            with open(file_path, "r", encoding="utf-8") as fh:
+                payload = json.load(fh)
+        except Exception as e:
+            print(f"Failed to read/parse {file_path}: {e}")
+            return
+
+        try:
+            response = requests.post(url, json=payload)
+            print("File:", file_path.name)
+            print("Status Code:", response.status_code)
             try:
-                response = requests.post(url, files=files)
-                print("Status Code:", response.status_code)
                 print("Response JSON:", response.json())
-            except requests.exceptions.RequestException as e:
-                print(f"Error during request: {e}")
+            except ValueError:
+                print("Response Text:", response.text)
+        except requests.exceptions.RequestException as e:
+            print(f"Error during request: {e}")
 
     def main(self):
         url = f"http://127.0.0.1:{self.port}/upload"
@@ -39,8 +44,8 @@ class AgentTester:
         ]
 
         for file_name in files:
-            # Send requests for both files
-            self.send(url, Path(self.path, file_name))
+            # Send JSON payloads from the sample files
+            self.send_json(url, Path(self.path, file_name))
         # self.send(url, file_txt, "text/plain")
 
 
