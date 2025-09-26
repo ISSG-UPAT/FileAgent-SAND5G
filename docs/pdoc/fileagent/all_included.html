@@ -186,7 +186,7 @@ el.replaceWith(d);
         &#34;&#34;&#34;
 
         @self.app.post(&#34;/upload&#34;)
-        async def upload_file(file: UploadFile = File(...)):
+        async def upload_json(file: UploadFile = File(...)):
             if not file:
                 raise HTTPException(
                     status_code=400, detail=&#34;No file part in the request&#34;
@@ -870,7 +870,7 @@ Checks if it is a json or text file and extracts the ip address</p>
     &#34;&#34;&#34;
 
     @self.app.post(&#34;/upload&#34;)
-    async def upload_file(file: UploadFile = File(...)):
+    async def upload_json(file: UploadFile = File(...)):
         if not file:
             raise HTTPException(
                 status_code=400, detail=&#34;No file part in the request&#34;

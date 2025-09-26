@@ -138,11 +138,11 @@ el.replaceWith(d);
         &#34;&#34;&#34;
         parts, opts = self.builder(
             action=&#34;block&#34;,
-            protocol=&#34;http&#34;,
+            protocol=&#34;ip&#34;,
             src_ip=target,
             src_port=&#34;any&#34;,
             direction=&#34;-&gt;&#34;,
-            dst_ip=&#34;$HOME_NET&#34;,
+            dst_ip=&#34;any&#34;,
             dst_port=&#34;any&#34;,
             sid=self.get_current_sid(),
             msg=msg or f&#34;Block traffic From IP {target}&#34;,
@@ -173,7 +173,7 @@ el.replaceWith(d);
             src_ip=target,
             src_port=&#34;any&#34;,
             direction=&#34;-&gt;&#34;,
-            dst_ip=&#34;$HOME_NET&#34;,
+            dst_ip=&#34;any&#34;,
             dst_port=&#34;any&#34;,
             sid=self.get_current_sid(),
             msg=msg or f&#34;Block ICMP From IP {target}&#34;,
@@ -204,7 +204,7 @@ el.replaceWith(d);
             src_ip=target,
             src_port=&#34;any&#34;,
             direction=&#34;-&gt;&#34;,
-            dst_ip=&#34;$HOME_NET&#34;,
+            dst_ip=&#34;any&#34;,
             dst_port=&#34;any&#34;,
             sid=self.get_current_sid(),
             msg=msg or f&#34;Alert ICMP From IP {target}&#34;,
@@ -237,11 +237,12 @@ el.replaceWith(d);
             src_ip=&#34;any&#34;,
             src_port=&#34;any&#34;,
             direction=&#34;-&gt;&#34;,
-            dst_ip=&#34;$HOME_NET&#34;,
+            dst_ip=&#34;any&#34;,
             dst_port=443,
             sid=self.get_current_sid(),
-            msg=msg or f&#34;Block domain {domain}&#34;,
-            content=[{&#34;value&#34;: self.to_hex(domain)}],
+            ssl_state=&#34;client_hello&#34;,
+            msg=msg or f&#34;Block domain with SNI {domain}&#34;,
+            content=[{&#34;value&#34;: f&#34;|{self.to_hex(domain)}|&#34;}],
         )
 
         rule = self.build_formatter(parts, opts, pretty=True)
@@ -268,13 +269,12 @@ el.replaceWith(d);
             src_ip=target,
             src_port=&#34;any&#34;,
             direction=&#34;-&gt;&#34;,
-            dst_ip=&#34;$HOME_NET&#34;,
+            dst_ip=&#34;any&#34;,
             dst_port=&#34;any&#34;,
             msg=msg or f&#34;IP Alert Incoming From IP {target}&#34;,
             classtype=&#34;tcp-connection&#34;,
-            sid=28154103,
+            sid=self.get_current_sid(),
             rev=1,
-            reference=[(&#34;url&#34;, &#34;https://misp.gsma.com/events/view/19270&#34;)],
         )
 
         rule = self.build_formatter(parts, opts, pretty=True)
@@ -418,13 +418,13 @@ el.replaceWith(d);
             &#34;&#34;&#34;
             if isinstance(val, list):
                 for v in val:
-                    opts.append(f&#34;{name}:{v};&#34;)
+                    opts.append(f&#34;{name}: {v};&#34;)
             elif val is not None:
-                opts.append(f&#34;{name}:{val};&#34;)
+                opts.append(f&#34;{name}: {val};&#34;)
 
         # general opts
         if msg:
-            opts.append(f&#34;msg:&#39;{msg}&#39;;&#34;)
+            opts.append(f&#39;msg:&#34;{msg}&#34;;&#39;)
         if reference:
             # reference is a list of tuples (scheme, id)
             # e.g. [(&#39;url&#39;, &#39;example.com&#39;), (&#39;cve&#39;, &#39;CVE-2023-1234&#39;)]
@@ -436,7 +436,7 @@ el.replaceWith(d);
         opt(&#34;gid&#34;, gid)
         opt(&#34;sid&#34;, sid)
         opt(&#34;rev&#34;, rev)
-
+        opt(&#34;ssl_state&#34;, ssl_state)
         if classtype:
             opts.append(f&#34;classtype:{classtype};&#34;)
 
@@ -463,7 +463,7 @@ el.replaceWith(d);
         # payload opts example
         if content:
             for c in content:
-                segs = [f&#34;content:&#39;{c[&#39;value&#39;]}&#39;&#34;]
+                segs = [f&#39;content:&#34;{c[&#39;value&#39;]}&#34;&#39;]
                 for m in (
                     &#34;fast_pattern&#34;,
                     &#34;nocase&#34;,
@@ -501,7 +501,7 @@ el.replaceWith(d);
     def build_formatter(
         self, parts: list[str], opts: list[str], pretty: bool = False
     ) -&gt; str:
-        print(parts)
+        # print(parts)
         header = &#34; &#34;.join(
             list(map(lambda x: x if isinstance(x, str) else str(x), parts))
         )
@@ -757,7 +757,7 @@ Append rule to the local.rules</p>
 <pre><code class="python">def build_formatter(
     self, parts: list[str], opts: list[str], pretty: bool = False
 ) -&gt; str:
-    print(parts)
+    # print(parts)
     header = &#34; &#34;.join(
         list(map(lambda x: x if isinstance(x, str) else str(x), parts))
     )
@@ -915,13 +915,13 @@ Append rule to the local.rules</p>
         &#34;&#34;&#34;
         if isinstance(val, list):
             for v in val:
-                opts.append(f&#34;{name}:{v};&#34;)
+                opts.append(f&#34;{name}: {v};&#34;)
         elif val is not None:
-            opts.append(f&#34;{name}:{val};&#34;)
+            opts.append(f&#34;{name}: {val};&#34;)
 
     # general opts
     if msg:
-        opts.append(f&#34;msg:&#39;{msg}&#39;;&#34;)
+        opts.append(f&#39;msg:&#34;{msg}&#34;;&#39;)
     if reference:
         # reference is a list of tuples (scheme, id)
         # e.g. [(&#39;url&#39;, &#39;example.com&#39;), (&#39;cve&#39;, &#39;CVE-2023-1234&#39;)]
@@ -933,7 +933,7 @@ Append rule to the local.rules</p>
     opt(&#34;gid&#34;, gid)
     opt(&#34;sid&#34;, sid)
     opt(&#34;rev&#34;, rev)
-
+    opt(&#34;ssl_state&#34;, ssl_state)
     if classtype:
         opts.append(f&#34;classtype:{classtype};&#34;)
 
@@ -960,7 +960,7 @@ Append rule to the local.rules</p>
     # payload opts example
     if content:
         for c in content:
-            segs = [f&#34;content:&#39;{c[&#39;value&#39;]}&#39;&#34;]
+            segs = [f&#39;content:&#34;{c[&#39;value&#39;]}&#34;&#39;]
             for m in (
                 &#34;fast_pattern&#34;,
                 &#34;nocase&#34;,
@@ -1105,13 +1105,12 @@ the rule according to Snort syntax.</p>
         src_ip=target,
         src_port=&#34;any&#34;,
         direction=&#34;-&gt;&#34;,
-        dst_ip=&#34;$HOME_NET&#34;,
+        dst_ip=&#34;any&#34;,
         dst_port=&#34;any&#34;,
         msg=msg or f&#34;IP Alert Incoming From IP {target}&#34;,
         classtype=&#34;tcp-connection&#34;,
-        sid=28154103,
+        sid=self.get_current_sid(),
         rev=1,
-        reference=[(&#34;url&#34;, &#34;https://misp.gsma.com/events/view/19270&#34;)],
     )
 
     rule = self.build_formatter(parts, opts, pretty=True)
@@ -1164,7 +1163,7 @@ the rule according to Snort syntax.</p>
         src_ip=target,
         src_port=&#34;any&#34;,
         direction=&#34;-&gt;&#34;,
-        dst_ip=&#34;$HOME_NET&#34;,
+        dst_ip=&#34;any&#34;,
         dst_port=&#34;any&#34;,
         sid=self.get_current_sid(),
         msg=msg or f&#34;Alert ICMP From IP {target}&#34;,
@@ -1214,11 +1213,11 @@ the rule according to Snort syntax.</p>
     &#34;&#34;&#34;
     parts, opts = self.builder(
         action=&#34;block&#34;,
-        protocol=&#34;http&#34;,
+        protocol=&#34;ip&#34;,
         src_ip=target,
         src_port=&#34;any&#34;,
         direction=&#34;-&gt;&#34;,
-        dst_ip=&#34;$HOME_NET&#34;,
+        dst_ip=&#34;any&#34;,
         dst_port=&#34;any&#34;,
         sid=self.get_current_sid(),
         msg=msg or f&#34;Block traffic From IP {target}&#34;,
@@ -1274,11 +1273,12 @@ the rule according to Snort syntax.</p>
         src_ip=&#34;any&#34;,
         src_port=&#34;any&#34;,
         direction=&#34;-&gt;&#34;,
-        dst_ip=&#34;$HOME_NET&#34;,
+        dst_ip=&#34;any&#34;,
         dst_port=443,
         sid=self.get_current_sid(),
-        msg=msg or f&#34;Block domain {domain}&#34;,
-        content=[{&#34;value&#34;: self.to_hex(domain)}],
+        ssl_state=&#34;client_hello&#34;,
+        msg=msg or f&#34;Block domain with SNI {domain}&#34;,
+        content=[{&#34;value&#34;: f&#34;|{self.to_hex(domain)}|&#34;}],
     )
 
     rule = self.build_formatter(parts, opts, pretty=True)
@@ -1331,7 +1331,7 @@ the rule according to Snort syntax.</p>
         src_ip=target,
         src_port=&#34;any&#34;,
         direction=&#34;-&gt;&#34;,
-        dst_ip=&#34;$HOME_NET&#34;,
+        dst_ip=&#34;any&#34;,
         dst_port=&#34;any&#34;,
         sid=self.get_current_sid(),
         msg=msg or f&#34;Block ICMP From IP {target}&#34;,

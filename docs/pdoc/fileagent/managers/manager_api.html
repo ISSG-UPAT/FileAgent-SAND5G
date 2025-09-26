@@ -93,27 +93,31 @@ el.replaceWith(d);
         &#34;&#34;&#34;
 
         @self.app.post(&#34;/upload&#34;)
-        async def upload_file(file: UploadFile = File(...)):
-            if not file:
-                raise HTTPException(
-                    status_code=400, detail=&#34;No file part in the request&#34;
-                )
+        async def upload_json(payload: Dict[str, Any] = Body(...)):
+            &#34;&#34;&#34;
+            Accept a JSON body (application/json) in `payload`.
+            &#34;&#34;&#34;
 
-            if file.filename == &#34;&#34;:
-                raise HTTPException(status_code=400, detail=&#34;No file selected&#34;)
+            if not payload:
+                raise HTTPException(status_code=400, detail=&#34;Empty JSON payload&#34;)
 
-            return await self.upload_functionality(file)
+            content_dict = payload
+            # from managersnort
+            self.append_rule(content_dict)
+            # from managerfile
+            self.save_history(content_dict)
+            return {&#34;message&#34;: &#34;JSON payload received&#34;, &#34;content&#34;: content_dict}
 
-        @self.app.get(&#34;/dashboard&#34;)
-        async def dashboard():
+        @self.app.get(&#34;/notifications&#34;)
+        async def notifications():
             &#34;&#34;&#34;
             Description:
-                Endpoint to retrieve the dashboard data.
+                Endpoint to retrieve the notifications data.
                 This is a placeholder function that can be expanded to return
-                actual dashboard data in the future.
+                actual notifications data in the future.
 
             Returns:
-                dict: A simple message indicating the dashboard is ready.
+                dict: A simple message indicating the notifications is ready.
             &#34;&#34;&#34;
             # function from manager_files.py
 
@@ -124,46 +128,13 @@ el.replaceWith(d);
             history = notifications.get(&#34;history&#34;)
 
             return {
-                &#34;message&#34;: &#34;Dashboard is ready&#34;,
+                &#34;message&#34;: &#34;notifications is ready&#34;,
                 &#34;latest&#34;: history[-1] if history else None,
                 &#34;timestamp&#34;: time.time(),
                 &#34;notifications&#34;: history[1:] if len(history) &gt; 1 else [],
             }
 
-    async def upload_functionality(self, file: UploadFile):
-        &#34;&#34;&#34;
-        Description:
-            Handle the file upload functionality
-            This function reads the content of the uploaded file and appends it to the rules file.
-            It checks the content type of the file and processes it accordingly.
-            If the content type is not supported, it raises an HTTPException.
-
-        Args:
-            file (UploadFile): The uploaded file to be processed
-
-        Raises:
-            HTTPException: If the file type is unsupported
-
-        Returns:
-            dict: A message indicating the file has been received and its content
-        &#34;&#34;&#34;
-
-        content = await file.read()
-        content_str = content.decode(&#34;utf-8&#34;)
-        content_dict = {}
-        try:
-            content_dict = json.loads(content_str)
-        except json.JSONDecodeError:
-            raise HTTPException(status_code=400, detail=&#34;Invalid JSON format&#34;)
-
-        if file.content_type == &#34;application/json&#34;:
-            # From managersnort
-            self.append_rule(content_dict)
-            # From managerfile
-            self.save_history(content_dict)
-            return {&#34;message&#34;: &#34;JSON file received&#34;, &#34;content&#34;: content_str}
-        else:
-            raise HTTPException(status_code=400, detail=&#34;Unsupported file type&#34;)
+    # Note: file upload handling removed; /upload accepts JSON payloads only.
 
     def run_uvicorn(self):
         &#34;&#34;&#34;
@@ -255,27 +226,31 @@ el.replaceWith(d);
     &#34;&#34;&#34;
 
     @self.app.post(&#34;/upload&#34;)
-    async def upload_file(file: UploadFile = File(...)):
-        if not file:
-            raise HTTPException(
-                status_code=400, detail=&#34;No file part in the request&#34;
-            )
+    async def upload_json(payload: Dict[str, Any] = Body(...)):
+        &#34;&#34;&#34;
+        Accept a JSON body (application/json) in `payload`.
+        &#34;&#34;&#34;
 
-        if file.filename == &#34;&#34;:
-            raise HTTPException(status_code=400, detail=&#34;No file selected&#34;)
+        if not payload:
+            raise HTTPException(status_code=400, detail=&#34;Empty JSON payload&#34;)
 
-        return await self.upload_functionality(file)
+        content_dict = payload
+        # from managersnort
+        self.append_rule(content_dict)
+        # from managerfile
+        self.save_history(content_dict)
+        return {&#34;message&#34;: &#34;JSON payload received&#34;, &#34;content&#34;: content_dict}
 
-    @self.app.get(&#34;/dashboard&#34;)
-    async def dashboard():
+    @self.app.get(&#34;/notifications&#34;)
+    async def notifications():
         &#34;&#34;&#34;
         Description:
-            Endpoint to retrieve the dashboard data.
+            Endpoint to retrieve the notifications data.
             This is a placeholder function that can be expanded to return
-            actual dashboard data in the future.
+            actual notifications data in the future.
 
         Returns:
-            dict: A simple message indicating the dashboard is ready.
+            dict: A simple message indicating the notifications is ready.
         &#34;&#34;&#34;
         # function from manager_files.py
 
@@ -286,7 +261,7 @@ el.replaceWith(d);
         history = notifications.get(&#34;history&#34;)
 
         return {
-            &#34;message&#34;: &#34;Dashboard is ready&#34;,
+            &#34;message&#34;: &#34;notifications is ready&#34;,
             &#34;latest&#34;: history[-1] if history else None,
             &#34;timestamp&#34;: time.time(),
             &#34;notifications&#34;: history[1:] if len(history) &gt; 1 else [],
@@ -306,70 +281,6 @@ el.replaceWith(d);
 <dl>
 <dt><code>_type_</code></dt>
 <dd><em>description</em></dd>
-</dl></div>
-</dd>
-<dt id="fileagent.managers.manager_api.ManagerAPI.upload_functionality"><code class="name flex">
-<span>async def <span class="ident">upload_functionality</span></span>(<span>self, file: fastapi.datastructures.UploadFile)</span>
-</code></dt>
-<dd>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">async def upload_functionality(self, file: UploadFile):
-    &#34;&#34;&#34;
-    Description:
-        Handle the file upload functionality
-        This function reads the content of the uploaded file and appends it to the rules file.
-        It checks the content type of the file and processes it accordingly.
-        If the content type is not supported, it raises an HTTPException.
-
-    Args:
-        file (UploadFile): The uploaded file to be processed
-
-    Raises:
-        HTTPException: If the file type is unsupported
-
-    Returns:
-        dict: A message indicating the file has been received and its content
-    &#34;&#34;&#34;
-
-    content = await file.read()
-    content_str = content.decode(&#34;utf-8&#34;)
-    content_dict = {}
-    try:
-        content_dict = json.loads(content_str)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail=&#34;Invalid JSON format&#34;)
-
-    if file.content_type == &#34;application/json&#34;:
-        # From managersnort
-        self.append_rule(content_dict)
-        # From managerfile
-        self.save_history(content_dict)
-        return {&#34;message&#34;: &#34;JSON file received&#34;, &#34;content&#34;: content_str}
-    else:
-        raise HTTPException(status_code=400, detail=&#34;Unsupported file type&#34;)</code></pre>
-</details>
-<div class="desc"><h2 id="description">Description</h2>
-<p>Handle the file upload functionality
-This function reads the content of the uploaded file and appends it to the rules file.
-It checks the content type of the file and processes it accordingly.
-If the content type is not supported, it raises an HTTPException.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>file</code></strong> :&ensp;<code>UploadFile</code></dt>
-<dd>The uploaded file to be processed</dd>
-</dl>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>HTTPException</code></dt>
-<dd>If the file type is unsupported</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><code>dict</code></dt>
-<dd>A message indicating the file has been received and its content</dd>
 </dl></div>
 </dd>
 </dl>
@@ -394,7 +305,6 @@ If the content type is not supported, it raises an HTTPException.</p>
 <ul class="">
 <li><code><a title="fileagent.managers.manager_api.ManagerAPI.run_uvicorn" href="#fileagent.managers.manager_api.ManagerAPI.run_uvicorn">run_uvicorn</a></code></li>
 <li><code><a title="fileagent.managers.manager_api.ManagerAPI.setup_routes" href="#fileagent.managers.manager_api.ManagerAPI.setup_routes">setup_routes</a></code></li>
-<li><code><a title="fileagent.managers.manager_api.ManagerAPI.upload_functionality" href="#fileagent.managers.manager_api.ManagerAPI.upload_functionality">upload_functionality</a></code></li>
 </ul>
 </li>
 </ul>
