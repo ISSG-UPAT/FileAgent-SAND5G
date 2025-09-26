@@ -79,7 +79,7 @@ class TestFileAgent(unittest.TestCase):
         mock_backup.assert_called_once()
         mock_file().write.assert_called()
 
-    def test_upload_file(self):
+    def test_upload_json(self):
         """Test the /upload endpoint."""
         response = self.client.post(
             "/upload",
