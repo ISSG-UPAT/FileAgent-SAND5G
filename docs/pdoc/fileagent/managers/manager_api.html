@@ -92,21 +92,113 @@ el.replaceWith(d);
             _type_: _description_
         &#34;&#34;&#34;
 
-        @self.app.post(&#34;/upload&#34;)
-        async def upload_json(payload: Dict[str, Any] = Body(...)):
+        @self.app.post(
+            &#34;/upload&#34;,
+            summary=&#34;Upload JSON payload and translate to Snort rule&#34;,
+            description=(
+                &#34;Accept a JSON payload which will be translated to a Snort rule by &#34;
+                &#34;manager_snort.rule_translator. The endpoint runs the translation/append &#34;
+                &#34;pipeline: rule_translator -&gt; duplicate check (rule_exists) -&gt; append_rule -&gt; save_history.\n\n&#34;
+                &#34;The rule_translator implementation determines accepted JSON shapes. Common examples:\n&#34;
+                &#39; - Simple content wrapper: {&#34;content&#34;: {&#34;ip&#34;: &#34;192.168.1.1&#34;}}\n&#39;
+                &#39; - Explicit fields: {&#34;command&#34;: &#34;block&#34;, &#34;target&#34;: &#34;192.168.1.1&#34;}\n&#39;
+                &#39; - Full rule string (if translator accepts it): {&#34;rule&#34;: &#34;alert ip 1.2.3.4 ...&#34;}\n\n&#39;
+                &#34;The translator must return a rule string on success; otherwise the request is rejected.&#34;
+            ),
+            responses={
+                200: {&#34;description&#34;: &#34;Rule processed successfully&#34;},
+                400: {
+                    &#34;description&#34;: &#34;Bad request — invalid or empty JSON payload or translation failed&#34;
+                },
+                409: {&#34;description&#34;: &#34;Duplicate rule — rule already exists&#34;},
+                500: {&#34;description&#34;: &#34;Internal server error while processing rule&#34;},
+            },
+        )
+        async def upload_json(
+            payload: Dict[str, Any] = Body(
+                ...,
+                examples={
+                    &#34;alert_ip_sample&#34;: {
+                        &#34;summary&#34;: &#34;Alert on IP (matches tests/manual/alert_ip.json)&#34;,
+                        &#34;value&#34;: {
+                            &#34;file&#34;: &#34;sample&#34;,
+                            &#34;command&#34;: &#34;alert_ip&#34;,
+                            &#34;target&#34;: &#34;10.1.39.20&#34;,
+                        },
+                    },
+                    &#34;block_ip_sample&#34;: {
+                        &#34;summary&#34;: &#34;Block an IP (matches tests/manual/block_ip.json)&#34;,
+                        &#34;value&#34;: {
+                            &#34;file&#34;: &#34;sample&#34;,
+                            &#34;command&#34;: &#34;block_ip&#34;,
+                            &#34;target&#34;: &#34;10.1.39.20&#34;,
+                        },
+                    },
+                    &#34;block_domain_sample&#34;: {
+                        &#34;summary&#34;: &#34;Block a domain (matches tests/manual/block_domain.json)&#34;,
+                        &#34;value&#34;: {
+                            &#34;file&#34;: &#34;Block Domain&#34;,
+                            &#34;command&#34;: &#34;block_domain&#34;,
+                            &#34;target&#34;: &#34;forbidden.site&#34;,
+                        },
+                    },
+                },
+            ),
+        ):
             &#34;&#34;&#34;
             Accept a JSON body (application/json) in `payload`.
-            &#34;&#34;&#34;
 
+            Validation and processing notes:
+            - The payload must be non-empty JSON.
+            - manager_snort.rule_translator(payload) is expected to produce a Snort rule string.
+            - If translation fails (translator returns None or empty), a 400 response is appropriate.
+            - If a duplicate is detected via manager_snort.rule_exists(rule) a 409 is appropriate.
+            - On success the rule is appended (append_rule) and the payload is recorded (save_history).
+            &#34;&#34;&#34;
             if not payload:
                 raise HTTPException(status_code=400, detail=&#34;Empty JSON payload&#34;)
 
-            content_dict = payload
-            # from managersnort
-            self.append_rule(content_dict)
-            # from managerfile
-            self.save_history(content_dict)
-            return {&#34;message&#34;: &#34;JSON payload received&#34;, &#34;content&#34;: content_dict}
+            # Attempt translation if available
+            rule = None
+            try:
+                if hasattr(self, &#34;rule_translator&#34;):
+                    rule = self.rule_translator(payload)
+            except Exception as exc:
+                raise HTTPException(status_code=400, detail=f&#34;Translation error: {exc}&#34;)
+
+            if not rule:
+                # translation failed or returned nothing; inform the client
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        &#34;Translation failed or returned no rule. Ensure payload matches &#34;
+                        &#34;the manager_snort.rule_translator expected schema (command/target or content).&#34;
+                    ),
+                )
+
+            # duplicate check
+            try:
+                if hasattr(self, &#34;rule_exists&#34;) and self.rule_exists(rule):
+                    raise HTTPException(status_code=409, detail=&#34;Duplicate rule&#34;)
+            except HTTPException:
+                raise
+            except Exception:
+                # If duplicate check fails for any reason, continue cautiously
+                pass
+
+            # Append and save
+            try:
+                if hasattr(self, &#34;append_rule&#34;):
+                    # append_rule expects the original payload in current code
+                    self.append_rule(payload)
+                if hasattr(self, &#34;save_history&#34;):
+                    self.save_history(payload)
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=500, detail=f&#34;Failed to persist rule: {exc}&#34;
+                )
+
+            return {&#34;message&#34;: &#34;JSON payload received and processed&#34;, &#34;rule&#34;: rule}
 
         @self.app.get(&#34;/notifications&#34;)
         async def notifications():
@@ -225,21 +317,113 @@ el.replaceWith(d);
         _type_: _description_
     &#34;&#34;&#34;
 
-    @self.app.post(&#34;/upload&#34;)
-    async def upload_json(payload: Dict[str, Any] = Body(...)):
+    @self.app.post(
+        &#34;/upload&#34;,
+        summary=&#34;Upload JSON payload and translate to Snort rule&#34;,
+        description=(
+            &#34;Accept a JSON payload which will be translated to a Snort rule by &#34;
+            &#34;manager_snort.rule_translator. The endpoint runs the translation/append &#34;
+            &#34;pipeline: rule_translator -&gt; duplicate check (rule_exists) -&gt; append_rule -&gt; save_history.\n\n&#34;
+            &#34;The rule_translator implementation determines accepted JSON shapes. Common examples:\n&#34;
+            &#39; - Simple content wrapper: {&#34;content&#34;: {&#34;ip&#34;: &#34;192.168.1.1&#34;}}\n&#39;
+            &#39; - Explicit fields: {&#34;command&#34;: &#34;block&#34;, &#34;target&#34;: &#34;192.168.1.1&#34;}\n&#39;
+            &#39; - Full rule string (if translator accepts it): {&#34;rule&#34;: &#34;alert ip 1.2.3.4 ...&#34;}\n\n&#39;
+            &#34;The translator must return a rule string on success; otherwise the request is rejected.&#34;
+        ),
+        responses={
+            200: {&#34;description&#34;: &#34;Rule processed successfully&#34;},
+            400: {
+                &#34;description&#34;: &#34;Bad request — invalid or empty JSON payload or translation failed&#34;
+            },
+            409: {&#34;description&#34;: &#34;Duplicate rule — rule already exists&#34;},
+            500: {&#34;description&#34;: &#34;Internal server error while processing rule&#34;},
+        },
+    )
+    async def upload_json(
+        payload: Dict[str, Any] = Body(
+            ...,
+            examples={
+                &#34;alert_ip_sample&#34;: {
+                    &#34;summary&#34;: &#34;Alert on IP (matches tests/manual/alert_ip.json)&#34;,
+                    &#34;value&#34;: {
+                        &#34;file&#34;: &#34;sample&#34;,
+                        &#34;command&#34;: &#34;alert_ip&#34;,
+                        &#34;target&#34;: &#34;10.1.39.20&#34;,
+                    },
+                },
+                &#34;block_ip_sample&#34;: {
+                    &#34;summary&#34;: &#34;Block an IP (matches tests/manual/block_ip.json)&#34;,
+                    &#34;value&#34;: {
+                        &#34;file&#34;: &#34;sample&#34;,
+                        &#34;command&#34;: &#34;block_ip&#34;,
+                        &#34;target&#34;: &#34;10.1.39.20&#34;,
+                    },
+                },
+                &#34;block_domain_sample&#34;: {
+                    &#34;summary&#34;: &#34;Block a domain (matches tests/manual/block_domain.json)&#34;,
+                    &#34;value&#34;: {
+                        &#34;file&#34;: &#34;Block Domain&#34;,
+                        &#34;command&#34;: &#34;block_domain&#34;,
+                        &#34;target&#34;: &#34;forbidden.site&#34;,
+                    },
+                },
+            },
+        ),
+    ):
         &#34;&#34;&#34;
         Accept a JSON body (application/json) in `payload`.
-        &#34;&#34;&#34;
 
+        Validation and processing notes:
+        - The payload must be non-empty JSON.
+        - manager_snort.rule_translator(payload) is expected to produce a Snort rule string.
+        - If translation fails (translator returns None or empty), a 400 response is appropriate.
+        - If a duplicate is detected via manager_snort.rule_exists(rule) a 409 is appropriate.
+        - On success the rule is appended (append_rule) and the payload is recorded (save_history).
+        &#34;&#34;&#34;
         if not payload:
             raise HTTPException(status_code=400, detail=&#34;Empty JSON payload&#34;)
 
-        content_dict = payload
-        # from managersnort
-        self.append_rule(content_dict)
-        # from managerfile
-        self.save_history(content_dict)
-        return {&#34;message&#34;: &#34;JSON payload received&#34;, &#34;content&#34;: content_dict}
+        # Attempt translation if available
+        rule = None
+        try:
+            if hasattr(self, &#34;rule_translator&#34;):
+                rule = self.rule_translator(payload)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f&#34;Translation error: {exc}&#34;)
+
+        if not rule:
+            # translation failed or returned nothing; inform the client
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    &#34;Translation failed or returned no rule. Ensure payload matches &#34;
+                    &#34;the manager_snort.rule_translator expected schema (command/target or content).&#34;
+                ),
+            )
+
+        # duplicate check
+        try:
+            if hasattr(self, &#34;rule_exists&#34;) and self.rule_exists(rule):
+                raise HTTPException(status_code=409, detail=&#34;Duplicate rule&#34;)
+        except HTTPException:
+            raise
+        except Exception:
+            # If duplicate check fails for any reason, continue cautiously
+            pass
+
+        # Append and save
+        try:
+            if hasattr(self, &#34;append_rule&#34;):
+                # append_rule expects the original payload in current code
+                self.append_rule(payload)
+            if hasattr(self, &#34;save_history&#34;):
+                self.save_history(payload)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500, detail=f&#34;Failed to persist rule: {exc}&#34;
+            )
+
+        return {&#34;message&#34;: &#34;JSON payload received and processed&#34;, &#34;rule&#34;: rule}
 
     @self.app.get(&#34;/notifications&#34;)
     async def notifications():

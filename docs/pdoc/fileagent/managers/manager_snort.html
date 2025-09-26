@@ -115,6 +115,7 @@ el.replaceWith(d);
             &#34;block_ip&#34;: self.building_rule_block,
             &#34;block_domain&#34;: self.building_rule_block_domain,
             &#34;alert_ip&#34;: self.building_rule_alert,
+            &#34;alert_domain&#34;: self.building_rule_alert_domain,
             &#34;block_icmp&#34;: self.building_rule_block_icmp,
         }
 
@@ -242,6 +243,41 @@ el.replaceWith(d);
             sid=self.get_current_sid(),
             ssl_state=&#34;client_hello&#34;,
             msg=msg or f&#34;Block domain with SNI {domain}&#34;,
+            content=[{&#34;value&#34;: f&#34;|{self.to_hex(domain)}|&#34;}],
+        )
+
+        rule = self.build_formatter(parts, opts, pretty=True)
+
+        if verbose:
+            print(rule)
+        return rule
+
+    def building_rule_alert_domain(
+        self, domain: str, msg: str = None, verbose=False
+    ) -&gt; str:
+        &#34;&#34;&#34;
+        Builds a Snort rule to alert traffic to a specific domain.
+
+        Args:
+            domain (str): The target domain to alert.
+            msg (str, optional): Custom message for the rule. Defaults to None.
+            verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+        Returns:
+            str: The formatted Snort rule string.
+        &#34;&#34;&#34;
+
+        parts, opts = self.builder(
+            action=&#34;alert&#34;,
+            protocol=&#34;ssl&#34;,
+            src_ip=&#34;any&#34;,
+            src_port=&#34;any&#34;,
+            direction=&#34;-&gt;&#34;,
+            dst_ip=&#34;any&#34;,
+            dst_port=443,
+            sid=self.get_current_sid(),
+            ssl_state=&#34;client_hello&#34;,
+            msg=msg or f&#34;alert domain with SNI {domain}&#34;,
             content=[{&#34;value&#34;: f&#34;|{self.to_hex(domain)}|&#34;}],
         )
 
@@ -1135,6 +1171,65 @@ the rule according to Snort syntax.</p>
 <dd>The formatted Snort rule string.</dd>
 </dl></div>
 </dd>
+<dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_domain"><code class="name flex">
+<span>def <span class="ident">building_rule_alert_domain</span></span>(<span>self, domain: str, msg: str = None, verbose=False) ‑> str</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def building_rule_alert_domain(
+    self, domain: str, msg: str = None, verbose=False
+) -&gt; str:
+    &#34;&#34;&#34;
+    Builds a Snort rule to alert traffic to a specific domain.
+
+    Args:
+        domain (str): The target domain to alert.
+        msg (str, optional): Custom message for the rule. Defaults to None.
+        verbose (bool, optional): If True, prints the rule. Defaults to False.
+
+    Returns:
+        str: The formatted Snort rule string.
+    &#34;&#34;&#34;
+
+    parts, opts = self.builder(
+        action=&#34;alert&#34;,
+        protocol=&#34;ssl&#34;,
+        src_ip=&#34;any&#34;,
+        src_port=&#34;any&#34;,
+        direction=&#34;-&gt;&#34;,
+        dst_ip=&#34;any&#34;,
+        dst_port=443,
+        sid=self.get_current_sid(),
+        ssl_state=&#34;client_hello&#34;,
+        msg=msg or f&#34;alert domain with SNI {domain}&#34;,
+        content=[{&#34;value&#34;: f&#34;|{self.to_hex(domain)}|&#34;}],
+    )
+
+    rule = self.build_formatter(parts, opts, pretty=True)
+
+    if verbose:
+        print(rule)
+    return rule</code></pre>
+</details>
+<div class="desc"><p>Builds a Snort rule to alert traffic to a specific domain.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>domain</code></strong> :&ensp;<code>str</code></dt>
+<dd>The target domain to alert.</dd>
+<dt><strong><code>msg</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>Custom message for the rule. Defaults to None.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If True, prints the rule. Defaults to False.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The formatted Snort rule string.</dd>
+</dl></div>
+</dd>
 <dt id="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp"><code class="name flex">
 <span>def <span class="ident">building_rule_alert_icmp</span></span>(<span>self, target: str, msg: str = None, verbose=False) ‑> str</span>
 </code></dt>
@@ -1719,6 +1814,7 @@ duplicate entries in the rules file.</p>
         &#34;block_ip&#34;: self.building_rule_block,
         &#34;block_domain&#34;: self.building_rule_block_domain,
         &#34;alert_ip&#34;: self.building_rule_alert,
+        &#34;alert_domain&#34;: self.building_rule_alert_domain,
         &#34;block_icmp&#34;: self.building_rule_block_icmp,
     }
 
@@ -1801,6 +1897,7 @@ Checks if it is a json or text file and extracts the ip address</p>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.build_formatter" href="#fileagent.managers.manager_snort.ManagerSnort.build_formatter">build_formatter</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.builder" href="#fileagent.managers.manager_snort.ManagerSnort.builder">builder</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert">building_rule_alert</a></code></li>
+<li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_domain" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_domain">building_rule_alert_domain</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_alert_icmp">building_rule_alert_icmp</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_block">building_rule_block</a></code></li>
 <li><code><a title="fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain" href="#fileagent.managers.manager_snort.ManagerSnort.building_rule_block_domain">building_rule_block_domain</a></code></li>
