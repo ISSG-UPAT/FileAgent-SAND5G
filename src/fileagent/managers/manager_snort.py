@@ -65,6 +65,7 @@ class ManagerSnort:
             "alert_ip": self.building_rule_alert,
             "alert_domain": self.building_rule_alert_domain,
             "block_icmp": self.building_rule_block_icmp,
+            "custom": self.building_rule_custom,
         }
 
         rule = None
@@ -131,6 +132,16 @@ class ManagerSnort:
         rule = self.build_formatter(parts, opts, pretty=True)
         if verbose:
             print(rule)
+        return rule
+
+    def building_rule_custom(self, rule: str, verbose=False) -> str:
+        """
+        Returns the custom Snort rule provided from the user.
+
+        Returns:
+            str: The formatted Snort rule string.
+        """
+
         return rule
 
     def building_rule_alert_icmp(
