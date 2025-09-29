@@ -49,11 +49,11 @@ class ManagerAPI:
                 "Accept a JSON payload which will be translated to a Snort rule by "
                 "manager_snort.rule_translator. The endpoint runs the translation/append "
                 "pipeline: rule_translator -> duplicate check (rule_exists) -> append_rule -> save_history.\n\n"
-                "The rule_translator implementation determines accepted JSON shapes. Common examples:\n"
-                ' - Simple content wrapper: {"content": {"ip": "192.168.1.1"}}\n'
-                ' - Explicit fields: {"command": "block", "target": "192.168.1.1"}\n'
-                ' - Full rule string (if translator accepts it): {"rule": "alert ip 1.2.3.4 ..."}\n\n'
-                "The translator must return a rule string on success; otherwise the request is rejected."
+                "The rule_translator implementation determines accepted JSON shapes."
+                "The json needs two fields: 'command' and 'target' ."
+                "Acceptable commands: "
+                "alert_ip, block_ip, block_domain, alert_ip, alert_domain"
+                "Examples:\n"
             ),
             responses={
                 200: {"description": "Rule processed successfully"},

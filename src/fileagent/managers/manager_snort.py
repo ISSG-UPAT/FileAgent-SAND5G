@@ -568,6 +568,9 @@ class ManagerSnort:
             # For now this function can't accurately check if a snort rule is duplicate,
             # because of the different sids
 
+            # From the rule to add, create a temp without the sid
+            temp_rule = self.read_snort_rule_no_sid(rule)
+
             # rules = list(map(self.rule_splitter, rules))
             # rule_obj = self.rule_splitter(rule)
             if any(rule in rule_line for rule_line in rules):
@@ -629,6 +632,26 @@ class ManagerSnort:
                 multi_line = False
 
         return result
+
+    def read_snort_rule_no_sid(self, rule: str, pretty: bool = False) -> str:
+        """
+        Description:
+            Reads a Snort rule and removes the sid option.
+
+        Args:
+            rule (str): The Snort rule to be processed.
+
+        Returns:
+            str: The Snort rule without the sid option.
+        """
+        temp_rule = [
+            part for part in rule.split("\n") if not part.strip().startswith("sid:")
+        ]
+
+        # There is a better way with the rule_splitter function
+        if pretty:
+            return "\n".join(temp_rule)
+        return " ".join(temp_rule)
 
     def get_current_sid(self, start=10000, end=20000) -> int:
         """
