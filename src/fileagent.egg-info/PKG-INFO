@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: fileagent
-Version: 0.2.2
+Version: 0.2.4
 Summary: Python fileagent to accompany Snort in a container
 Author: Nikolas Filippatos
 License: MIT License
