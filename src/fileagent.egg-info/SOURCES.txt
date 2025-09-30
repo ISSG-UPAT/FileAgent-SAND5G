@@ -17,4 +17,3 @@ src/fileagent/managers/manager_api.py
 src/fileagent/managers/manager_arguments.py
 src/fileagent/managers/manager_files.py
 src/fileagent/managers/manager_snort.py
-tests/test_fileagent.py
