@@ -115,7 +115,10 @@ class ManagerAPI:
             ),
             version="1.0.0",
             openapi_tags=tags,
-            contact={"name": "Snort Manager", "url": "https://example.local"},
+            contact={
+                "name": "Snort Manager",
+                "url": "https://github.com/ISSG-UPAT/FileAgent-SAND5G/",
+            },
         )
         self.setup_routes()
         super().__init__(*args, **kwargs)
@@ -144,11 +147,6 @@ class ManagerAPI:
             summary="Translate payload to a Snort rule and persist",
             description=(
                 "Accepts a JSON payload and translates it into a Snort rule via `rule_translator`.\n\n"
-                "Pipeline:\n"
-                "1. **Translate** with `rule_translator(payload)`\n"
-                "2. **Duplicate check** with `rule_exists(rule)`\n"
-                "3. **Append** with `append_rule(payload)`\n"
-                "4. **Record** with `save_history(payload)`\n\n"
                 "Accepted commands (from ManagerSnort): `block_ip`, `block_domain`, `alert_ip`, "
                 "`alert_domain`, `block_icmp`, `custom`.\n"
                 "- For `custom`, provide the full Snort rule in `target`.\n"
