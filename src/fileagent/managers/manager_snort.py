@@ -717,6 +717,17 @@ class ManagerSnort:
 
         return parsed_rule
 
+    def clear_rules(self) -> bool:
+        """
+        Description:
+            Clear the rules file
+        """
+        # Backup the rules file
+        self.file_backup()
+        self.save_file_content(self.rules_file, "")
+
+        return True
+
 
 if __name__ == "__main__":
     snorty = ManagerSnort()

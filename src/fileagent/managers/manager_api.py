@@ -285,6 +285,61 @@ class ManagerAPI:
                 notifications=(history[1:] if history and len(history) > 1 else []),
             )
 
+        @self.app.get(
+            "/show_rules",
+            tags=["Rules"],
+            summary="Return the current Snort rules file contents",
+            description=(
+                "Returns the contents of the configured rules file. This endpoint relies on a mixin that provides:\n"
+                "- `get_file_content(path, [fmt])` to read the file\n"
+                "- `rules_file` attribute pointing to the rules file path."
+            ),
+        )
+        async def show_rules():
+            # Ensure the hosting instance exposes the required API
+            if not hasattr(self, "get_file_content") or not hasattr(self, "rules_file"):
+                raise HTTPException(
+                    status_code=500,
+                    detail="Rules backend not configured on this instance.",
+                )
+
+            try:
+                rules = self.get_file_content(self.rules_file)
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=500, detail=f"Failed to read rules: {exc}"
+                )
+
+            if rules is None:
+                raise HTTPException(status_code=404, detail="No rules found")
+
+            # Return as JSON payload for consistency with other endpoints
+            return JSONResponse(content={"rules": rules})
+
+        @self.app.post(
+            "/clear_rules",
+            tags=["Rules"],
+            summary="Clear the current Snort rules",
+            description=(
+                "Clears the configured rules file by invoking `clear_rules()` on the hosting instance. "
+            ),
+        )
+        async def clear_rules():
+            if not hasattr(self, "clear_rules") or not hasattr(self, "rules_file"):
+                raise HTTPException(
+                    status_code=500,
+                    detail="Rules backend not configured on this instance.",
+                )
+
+            try:
+                result = self.clear_rules()
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=500, detail=f"Failed to clear rules: {exc}"
+                )
+
+            return JSONResponse(content={"message": "rules cleared", "result": result})
+
     def run_uvicorn(self) -> None:
         """Start uvicorn with current host/port."""
         uvicorn.run(self.app, host=self.host, port=self.port)
