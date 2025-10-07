@@ -304,7 +304,7 @@ class ManagerAPI:
                 )
 
             try:
-                rules = self.get_file_content(self.rules_file)
+                rules = self.show_snort_rules()
             except Exception as exc:
                 raise HTTPException(
                     status_code=500, detail=f"Failed to read rules: {exc}"
@@ -332,7 +332,7 @@ class ManagerAPI:
                 )
 
             try:
-                result = self.clear_rules()
+                result = self.clear_snort_rules()
             except Exception as exc:
                 raise HTTPException(
                     status_code=500, detail=f"Failed to clear rules: {exc}"

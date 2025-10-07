@@ -717,7 +717,7 @@ class ManagerSnort:
 
         return parsed_rule
 
-    def clear_rules(self) -> bool:
+    def clear_snort_rules(self) -> bool:
         """
         Description:
             Clear the rules file
@@ -727,6 +727,14 @@ class ManagerSnort:
         self.save_file_content(self.rules_file, "")
 
         return True
+
+    def show_snort_rules(self) -> str:
+        """
+        Description:
+            Show the rules file content
+        """
+        rules = self.get_file_content(self.rules_file)
+        return rules.split("\n\n")
 
 
 if __name__ == "__main__":
