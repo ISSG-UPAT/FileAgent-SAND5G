@@ -75,6 +75,22 @@ class NotificationsResponse(BaseModel):
     )
 
 
+class ShowRulesResponse(BaseModel):
+    """Response model for the `/show_rules` endpoint.
+
+    Always returns a list of rule strings under the `rules` key for 200 responses.
+    """
+
+    rules: List[str] = Field(..., description="List of rules from the rules file.")
+
+
+class ClearRulesResponse(BaseModel):
+    """Response model for the `/clear_rules` endpoint."""
+
+    message: str = Field(..., description="Status message.")
+    result: Optional[Any] = Field(None, description="Optional backend result/value.")
+
+
 # ---------- API Class ----------
 class ManagerAPI:
     """
@@ -287,6 +303,11 @@ class ManagerAPI:
 
         @self.app.get(
             "/show_rules",
+            response_model=ShowRulesResponse,
+            responses={
+                404: {"model": ErrorResponse, "description": "No rules found."},
+                500: {"model": ErrorResponse, "description": "Failed to read rules."},
+            },
             tags=["Rules"],
             summary="Return the current Snort rules file contents",
             description=(
@@ -297,27 +318,70 @@ class ManagerAPI:
         )
         async def show_rules():
             # Ensure the hosting instance exposes the required API
-            if not hasattr(self, "get_file_content") or not hasattr(self, "rules_file"):
+            if not hasattr(self, "rules_file"):
                 raise HTTPException(
                     status_code=500,
                     detail="Rules backend not configured on this instance.",
                 )
 
+            # Prefer a generic file reader if provided, otherwise fall back to
+            # instance-specific helpers (e.g. show_snort_rules()).
+            reader = getattr(self, "show_snort_rules", None) or getattr(
+                self, "show_snort_rules", None
+            )
+            if reader is None:
+                raise HTTPException(
+                    status_code=500,
+                    detail="No method available to read rules on this instance.",
+                )
+
             try:
-                rules = self.show_snort_rules()
+                # If reader is get_file_content it typically expects (path, [fmt])
+                if getattr(self, "get_file_content", None) is reader:
+                    raw = reader(self.rules_file)
+                else:
+                    raw = reader()
             except Exception as exc:
                 raise HTTPException(
                     status_code=500, detail=f"Failed to read rules: {exc}"
                 )
 
-            if rules is None:
+            if raw is None:
                 raise HTTPException(status_code=404, detail="No rules found")
 
-            # Return as JSON payload for consistency with other endpoints
-            return JSONResponse(content={"rules": rules})
+            # Normalize to List[str]
+            def _normalize(r):
+                if isinstance(r, list):
+                    return [str(x).strip() for x in r if str(x).strip()]
+                if isinstance(r, str):
+                    return [
+                        line for line in (ln.strip() for ln in r.splitlines()) if line
+                    ]
+                if isinstance(r, dict):
+                    # Some backends might return {'rules': [...]}
+                    if "rules" in r:
+                        return _normalize(r["rules"])
+                    # Otherwise flatten stringified values
+                    vals = []
+                    for v in r.values():
+                        vals.extend(_normalize(v) if v is not None else [])
+                    return vals
+                # Fallback: stringify
+                return [str(r).strip()]
+
+            rules_list = _normalize(raw)
+
+            if not rules_list:
+                raise HTTPException(status_code=404, detail="No rules found")
+
+            return JSONResponse(content={"rules": rules_list})
 
         @self.app.post(
             "/clear_rules",
+            response_model=ClearRulesResponse,
+            responses={
+                500: {"model": ErrorResponse, "description": "Failed to clear rules."}
+            },
             tags=["Rules"],
             summary="Clear the current Snort rules",
             description=(
@@ -325,7 +389,9 @@ class ManagerAPI:
             ),
         )
         async def clear_rules():
-            if not hasattr(self, "clear_rules") or not hasattr(self, "rules_file"):
+            if not hasattr(self, "clear_snort_rules") or not hasattr(
+                self, "rules_file"
+            ):
                 raise HTTPException(
                     status_code=500,
                     detail="Rules backend not configured on this instance.",
