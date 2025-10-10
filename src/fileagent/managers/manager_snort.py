@@ -266,7 +266,7 @@ class ManagerSnort:
             direction="->",
             dst_ip="any",
             dst_port="any",
-            msg=msg or f"IP Alert Incoming From IP {target}",
+            msg=msg or f"Alert Traffic From IP {target}",
             classtype="tcp-connection",
             sid=self.get_current_sid(),
             rev=1,
