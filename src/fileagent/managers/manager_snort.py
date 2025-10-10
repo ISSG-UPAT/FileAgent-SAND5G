@@ -71,7 +71,7 @@ class ManagerSnort:
         rule = None
 
         if (command := data.get("command")) in tranlator_book.keys():
-            rule = tranlator_book[command](data.get("target"))
+            rule = tranlator_book[command](data.get("target"), data.get("msg", None))
         return rule
 
     def building_rule_block(self, target: str, msg: str = None, verbose=False) -> str:
@@ -95,7 +95,7 @@ class ManagerSnort:
             dst_ip="any",
             dst_port="any",
             sid=self.get_current_sid(),
-            msg=msg or f"Block traffic From IP {target}",
+            msg=msg or f"Block Traffic From IP {target}",
         )
 
         rule = self.build_formatter(parts, opts, pretty=True)
@@ -236,7 +236,7 @@ class ManagerSnort:
             dst_port=443,
             sid=self.get_current_sid(),
             ssl_state="client_hello",
-            msg=msg or f"alert domain with SNI {domain}",
+            msg=msg or f"Alert Domain with SNI {domain}",
             content=[{"value": f"|{self.to_hex(domain)}|"}],
         )
 
